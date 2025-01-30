@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <c-dashboard-layouts></c-dashboard-layouts>
+    <!-- Main Content -->
+    <main class="p-4 sm:ml-64">
+        <div class="p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+            <div class="space-y-6">
+                <!-- Header Section -->
+                <div class="flex justify-between items-center pb-4 border-b border-gray-100">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Regis Pelanggan</h1>
+                        <p class="text-sm text-gray-500 mt-1">Kelola pelanggan</p>
+                    </div>
+                    
+                    <a href="?tambah=true"
+                        class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                        </svg>
+                        Tambah Pelanggan
+                    </a>
+                </div>
+
+                <!-- Content Section -->
+                {% if pelanggan_tambah %}
+                    
+                        <c-form-crud-pelanggan></c-form-crud-pelanggan>
+                    
+                {% elif pelanggan_edit %}
+                    
+                        <c-form-crud-pelanggan></c-form-crud-pelanggan>
+                       
+                {% else %}
+                <div class="bg-white rounded-lg">
+                    {% include 'components/table.html' with 
+                        table_id="pelangganTable"
+                        table_data=table_data_pelanggan 
+                        table_column=table_column_pelanggan 
+                        show_export=True
+                        show_print=True
+                        show_filter=False
+                    %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="{% static 'js/flyonui.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        tableInstances['pelangganTable'] = new Table({
+            tableId: 'pelangganTable',
+            data: {{ table_data_pelanggan|safe }},
+            columns: {{ table_column_pelanggan|safe }},
+            detailConfig: {{ detail_config_pelanggan|safe }}
+        });
+    });
+</script>
+
+{% endblock %}

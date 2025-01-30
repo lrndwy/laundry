@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="flex flex-col h-screen bg-gray-50">
+    <c-dashboard-layouts></c-dashboard-layouts>
+    <!-- Main Content -->
+    <main class="p-4 sm:ml-64">
+        <div class="p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+            <div class="space-y-6">
+                <!-- Header Section -->
+                <div class="flex justify-between items-center pb-4 border-b border-gray-100">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Outlet admin</h1>
+                        <p class="text-sm text-gray-500 mt-1">Kelola outlet</p>
+                    </div>
+                    
+                    <a href="?tambah=true" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                            <path d="M5 12h14m-7-7v14"/>
+                        </svg>
+                        Tambah Outlet
+                    </a>
+                </div>
+
+                <!-- Content Section -->
+                {% if outlet_tambah %}
+                    <c-form-crud-outlet></c-form-crud-outlet>
+                {% elif outlet_edit %}
+                    <c-form-crud-outlet></c-form-crud-outlet>
+                {% else %}
+                    <div class="bg-white rounded-lg">
+                        {% include 'components/table.html' with 
+                            table_id="outletTable"
+                            table_data=table_data_outlet
+                            table_column=table_column_outlet
+                            detail_config=detail_config_outlet
+                            show_export=True
+                            show_print=True
+                            show_filter=False
+                        %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="{% static 'js/flyonui.js' %}"></script>
+<script>
+    // Inisialisasi tabel Outlet dengan animasi
+    document.addEventListener('DOMContentLoaded', function() {
+        tableInstances['outletTable'] = new Table({
+            tableId: 'outletTable',
+            data: {{ table_data_outlet|safe }},
+            columns: {{ table_column_outlet|safe }},
+            detailConfig: {{ detail_config_outlet|safe }},
+        });
+    });
+</script>
+{% endblock %}

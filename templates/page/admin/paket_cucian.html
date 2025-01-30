@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="flex flex-col h-screen bg-gray-50">
+    <c-dashboard-layouts></c-dashboard-layouts>
+    <!-- Main Content -->
+    <main class="p-4 sm:ml-64">
+        <div class="p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+            <div class="space-y-6">
+                <!-- Header Section -->
+                <div class="flex justify-between items-center pb-4 border-b border-gray-100">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Paket cucian admin</h1>
+                        <p class="text-sm text-gray-500 mt-1">Kelola paket cucian</p>
+                    </div>
+                    
+                    <a href="?tambah=true" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                            <path d="M5 12h14m-7-7v14"/>
+                        </svg>
+                        Tambah Paket
+                    </a>
+                </div>
+
+                <!-- Content Section -->
+                {% if paket_tambah %}
+                    <c-form-crud-paket></c-form-crud-paket>
+                {% elif paket_edit %}
+                    <c-form-crud-paket></c-form-crud-paket>
+                {% else %}
+                    <div class="bg-white rounded-lg">
+                        {% include 'components/table.html' with 
+                            table_id="paketTable"
+                            table_data=table_data_paket
+                            table_column=table_column_paket 
+                            show_export=True
+                            show_print=True
+                            show_filter=True
+                        %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="{% static 'js/flyonui.js' %}"></script>
+<script>
+    // Inisialisasi tabel Paket dengan animasi
+    document.addEventListener('DOMContentLoaded', function() {
+        tableInstances['paketTable'] = new Table({
+            tableId: 'paketTable',
+            data: {{ table_data_paket|safe }},
+            columns: {{ table_column_paket|safe }},
+            filters: [
+                {
+                    field: 'outlet',
+                    label: 'Outlet',
+                },
+                {
+                    field: 'jenis',
+                    label: 'Jenis',
+                }
+            ],
+            detailConfig: {{ detail_config_paket|safe }},
+        });
+    });
+</script>
+{% endblock %}

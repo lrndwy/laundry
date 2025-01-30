@@ -1,0 +1,135 @@
+<nav class="navbar bg-base-100 max-sm:rounded-box max-sm:shadow sm:border-b border-base-content/25 sm:z-[1] min-h-16 relative">
+  <button type="button" class="btn btn-text max-sm:btn-square sm:hidden me-2" aria-haspopup="dialog" aria-expanded="false" aria-controls="default-sidebar" data-overlay="#default-sidebar" >
+    <span class="icon-[tabler--menu-2] size-5"></span>
+  </button>
+  <div class="flex flex-1 items-center">
+    <a class="link text-base-content link-neutral text-xl font-semibold no-underline" href="#">
+      LaundryKu
+    </a>
+  </div>
+  <div class="navbar-end flex items-center gap-4">
+    <div class="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
+      <button id="dropdown-scrollable" type="button" class="dropdown-toggle flex items-center" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
+        <span class="text-base-content text-base font-semibold">{{ user.username }}</span>
+      </button>
+      <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-60" role="menu" aria-orientation="vertical" aria-labelledby="dropdown-avatar">
+        <li class="dropdown-header gap-2">
+          <div>
+            <h6 class="text-base-content text-base font-semibold">Outlet: {{ user.outlet.nama }}</h6>
+            <small class="text-base-content/50">Role: {{ user.role }}</small>
+          </div>
+        </li>
+        <li class="dropdown-footer gap-2">
+          <a class="btn btn-error btn-soft btn-block" href="{% url 'logout' %}">
+            <span class="icon-[tabler--logout]"></span>
+            Sign out
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<aside id="default-sidebar" class="overlay sm:shadow-none overlay-open:translate-x-0 drawer drawer-start hidden max-w-64 sm:absolute sm:z-0 sm:flex sm:translate-x-0 pt-16 min-h-screen" role="dialog" tabindex="-1" >
+  <div class="drawer-body px-2 pt-4">
+    <ul class="menu p-0">
+      <!-- Admin -->
+      {% if user.role == 'admin' %}
+      <li>
+        <a href="{% url 'admin_dashboard' %}" class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+          <span class="icon-[tabler--home] size-5"></span>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'admin_member' %}" class="{% if request.resolver_match.url_name == 'admin_member' %}active{% endif %}">
+          <span class="icon-[tabler--user] size-5"></span>
+          Member
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'admin_outlet' %}" class="{% if request.resolver_match.url_name == 'admin_outlet' %}active{% endif %}">
+          <span class="icon-[tabler--building] size-5"></span>
+          Outlet
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'admin_paket_cucian' %}" class="{% if request.resolver_match.url_name == 'admin_paket_cucian' %}active{% endif %}">
+          <span class="icon-[tabler--package] size-5"></span>
+          Paket Cucian
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'admin_regis_pelanggan' %}" class="{% if request.resolver_match.url_name == 'admin_regis_pelanggan' %}active{% endif %}">
+          <span class="icon-[tabler--user] size-5"></span>
+          Regis Pelanggan
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'admin_transaksi' %}" class="{% if request.resolver_match.url_name == 'admin_transaksi' %}active{% endif %}">
+          <span class="icon-[tabler--shopping-cart] size-5"></span>
+          Transaksi
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'admin_pengguna' %}" class="{% if request.resolver_match.url_name == 'admin_pengguna' %}active{% endif %}">
+          <span class="icon-[tabler--user] size-5"></span>
+          User
+        </a>
+      </li>
+      {% endif %}
+      
+      {% if user.role == 'kasir' %}
+      <li>
+        <a href="{% url 'kasir_dashboard' %}" class="{% if request.resolver_match.url_name == 'kasir_dashboard' %}active{% endif %}">
+          <span class="icon-[tabler--home] size-5"></span>
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'kasir_regis_pelanggan' %}" class="{% if request.resolver_match.url_name == 'kasir_regis_pelanggan' %}active{% endif %}">
+          <span class="icon-[tabler--user] size-5"></span>
+          Regis Pelanggan
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'kasir_member' %}" class="{% if request.resolver_match.url_name == 'kasir_member' %}active{% endif %}">
+          <span class="icon-[tabler--user] size-5"></span>
+          Member
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'kasir_paket_cucian' %}" class="{% if request.resolver_match.url_name == 'kasir_paket_cucian' %}active{% endif %}">
+          <span class="icon-[tabler--package] size-5"></span>
+          Paket Cucian
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'kasir_transaksi' %}" class="{% if request.resolver_match.url_name == 'kasir_transaksi' %}active{% endif %}">
+          <span class="icon-[tabler--shopping-cart] size-5"></span>
+          Transaksi
+        </a>
+      </li>
+      
+      {% endif %}
+      {% if user.role == 'owner' %}
+      <li>
+        <a href="{% url 'owner_dashboard' %}" class="{% if request.resolver_match.url_name == 'owner_dashboard' %}active{% endif %}">
+          <span class="icon-[tabler--home] size-5"></span>
+            Dashboard
+        </a>
+      </li>
+      {% endif %}
+      {% if user.role == 'member' %}
+      <li>
+        <a href="#" class="{% if request.resolver_match.url_name == 'member_email' %}active{% endif %}">
+          <span class="icon-[tabler--mail] size-5"></span>
+          Email
+          <span class="icon-[solar--user-bold] size-10"></span>
+        </a>
+      </li>
+
+      {% endif %}
+    </ul>
+  </div>
+</aside>

@@ -1,0 +1,114 @@
+<div id="notification-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-4 max-w-md w-full">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="notification-item animate-slide-left" data-type="{{ message.tags }}">
+                <div class="relative flex items-center p-5 rounded-xl backdrop-blur-lg shadow-lg border border-opacity-20
+                    {% if message.tags == 'success' %}
+                        bg-green-500/10 border-green-500 text-green-700 dark:text-green-200
+                    {% elif message.tags == 'error' %}
+                        bg-red-500/10 border-red-500 text-red-700 dark:text-red-200
+                    {% elif message.tags == 'warning' %}
+                        bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-200
+                    {% else %}
+                        bg-blue-500/10 border-blue-500 text-blue-700 dark:text-blue-200
+                    {% endif %}">
+                    <div class="flex items-center gap-4">
+                        <div class="flex-shrink-0 p-2 rounded-lg 
+                            {% if message.tags == 'success' %}
+                                bg-green-500/20
+                            {% elif message.tags == 'error' %}
+                                bg-red-500/20
+                            {% elif message.tags == 'warning' %}
+                                bg-yellow-500/20
+                            {% else %}
+                                bg-blue-500/20
+                            {% endif %}">
+                            {% if message.tags == 'success' %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            {% elif message.tags == 'error' %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                            {% elif message.tags == 'warning' %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            {% else %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            {% endif %}
+                        </div>
+                        <div class="flex flex-col">
+                            <h4 class="font-medium text-sm">
+                                {% if message.tags == 'success' %}Berhasil
+                                {% elif message.tags == 'error' %}Error
+                                {% elif message.tags == 'warning' %}Peringatan
+                                {% else %}Informasi
+                                {% endif %}
+                            </h4>
+                            <p class="text-sm opacity-90">{{ message }}</p>
+                        </div>
+                    </div>
+                    <button onclick="this.closest('.notification-item').remove()" 
+                            class="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<style>
+    @keyframes slideLeft {
+        0% {
+            opacity: 0;
+            transform: translateX(100%) scale(0.95);
+        }
+        100% {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+    }
+
+    @keyframes fadeOut {
+        0% {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: translateX(100%) scale(0.95);
+        }
+    }
+
+    .animate-slide-left {
+        animation: slideLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .fade-out {
+        animation: fadeOut 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .notification-item {
+        transform-origin: top right;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Modifikasi auto hide dengan animasi yang lebih halus
+    const notifications = document.querySelectorAll('.notification-item');
+    notifications.forEach(notification => {
+        setTimeout(() => {
+            notification.classList.add('fade-out');
+            setTimeout(() => {
+                notification.remove();
+            }, 400);
+        }, 5000);
+
+        // Tambahkan hover effect untuk pause timer
+        notification.addEventListener('mouseenter', () => {
+            notification.style.animationPlayState = 'paused';
+        });
+        notification.addEventListener('mouseleave', () => {
+            notification.style.animationPlayState = 'running';
+        });
+    });
+});
+</script> 

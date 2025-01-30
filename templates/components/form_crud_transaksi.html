@@ -1,0 +1,810 @@
+
+
+<div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+    <h2 class="text-xl font-bold mb-6">{% if transaksi_edit %}Form Edit Transaksi{% else %}Form Tambah Transaksi{% endif %}</h2>
+    
+    <form method="POST" action="" class="space-y-6">
+        {% csrf_token %}
+
+        {% if transaksi_edit %}
+            <input type="hidden" name="transaksi_id" value="{{ transaksi_edit.id }}">
+        {% endif %}
+
+        <!-- Grid untuk 2 kolom -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Kolom Kiri -->
+            <div class="space-y-6">
+                <!-- Kode Invoice -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        Kode Invoice <span class="text-red-500">*</span>
+                    </label>
+                    <div id="kode_invoice_display" class="text-lg font-semibold text-gray-900 dark:text-white">
+                        {{ transaksi_edit.kode_invoice|default:'' }}
+                    </div>
+                    <input type="hidden" name="kode_invoice" id="kode_invoice" required value="{{ transaksi_edit.kode_invoice|default:'' }}">
+                </div>
+
+                <!-- Pelanggan -->
+                <div>
+                    <label for="pelanggan" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        Pelanggan <span class="text-red-500">*</span>
+                    </label>
+                    <select name="pelanggan" id="pelanggan" required
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                        <option value="">Pilih Pelanggan</option>
+                        {% for p in pelanggan %}
+                            <option value="{{ p.id }}" {% if transaksi_edit.pelanggan.id == p.id %}selected{% endif %}>
+                                {{ p.nama }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Member -->
+                <div>
+                    <label for="member" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        Member
+                    </label>
+                      <select name="member" id="member"
+                          class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                          <option value="">Pilih Member</option>
+                          {% for m in members %}
+                              <option value="{{ m.id }}" {% if transaksi_edit.member.id == m.id %}selected{% endif %}>
+                                  {{ m.nama }}
+                              </option>
+                          {% endfor %}
+                      </select>
+                </div>
+
+                <!-- Detail Transaksi -->
+                <div class="border-t pt-6">
+                    <h3 class="text-lg font-semibold mb-4">Detail Transaksi</h3>
+                    
+                    <!-- Paket -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                            Paket <span class="text-red-500">*</span>
+                        </label>
+                        <div class="space-y-3 mb-3" id="formSelectedPaketList">
+                            <!-- Paket terpilih akan ditampilkan di sini -->
+                            <div class="text-sm text-gray-500 dark:text-gray-400 italic">
+                                Belum ada paket dipilih
+                            </div>
+                        </div>
+                        <button type="button" onclick="showPaketModal()"
+                            class="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12h14m-7-7v14"/>
+                            </svg>
+                            Pilih Paket
+                        </button>
+                        <!-- Hidden input untuk menyimpan data paket -->
+                        <input type="hidden" name="paket" id="paket" required>
+                    </div>
+        
+                    <!-- Keterangan -->
+                    <div>
+                        <label for="keterangan" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                            Keterangan
+                        </label>
+                        <textarea name="keterangan" id="keterangan" rows="3"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">{% if transaksi_edit.detail_transaksi_data.0 %}{{ transaksi_edit.detail_transaksi_data.0.keterangan }}{% endif %}</textarea>
+                    </div>
+                </div>
+
+                <!-- Outlet -->
+                <div>
+                    <label for="outlet" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        Outlet <span class="text-red-500">*</span>
+                    </label>
+                      <select name="outlet" id="outlet" required
+                          class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                          <option value="">Pilih Outlet</option>
+                          {% for o in outlets %}
+                              <option value="{{ o.id }}" {% if transaksi_edit.outlet.id == o.id %}selected{% endif %}>
+                                  {{ o }}
+                              </option>
+                          {% endfor %}
+                      </select>
+                </div>
+
+                <!-- Tanggal -->
+                <div>
+                    <label for="tanggal" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        Tanggal <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="tanggal" id="tanggal" required
+                        placeholder="YYYY-MM-DD"
+                        value="{{ transaksi_edit.tanggal|default:'' }}"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                </div>
+
+                <!-- Batas Waktu -->
+                <div>
+                    <label for="batas_waktu" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        Batas Waktu <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="batas_waktu" id="batas_waktu" required
+                        placeholder="YYYY-MM-DD"
+                        value="{{ transaksi_edit.batas_waktu|default:'' }}"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                </div>
+            </div>
+
+            <!-- Kolom Kanan -->
+            <div class="space-y-6">
+                <!-- Tanggal Bayar -->
+                <div>
+                    <label for="tgl_bayar" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        Tanggal Bayar
+                    </label>
+                    <input type="text" name="tgl_bayar" id="tgl_bayar"
+                        placeholder="YYYY-MM-DD"
+                        value="{{ transaksi_edit.tgl_bayar|default:'' }}"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                </div>
+
+                <!-- Biaya Tambahan -->
+                <div>
+                    <label for="biaya_tambahan" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        Biaya Tambahan
+                    </label>
+                    <input type="number" name="biaya_tambahan" id="biaya_tambahan"
+                        value="{{ transaksi_edit.biaya_tambahan|default:'' }}"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                </div>
+
+                <!-- Diskon -->
+                <div>
+                    <label for="diskon" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        Diskon %
+                    </label>
+                    <input type="number" name="diskon" id="diskon"
+                        value="{{ transaksi_edit.diskon|default:'' }}"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                </div>
+
+                <!-- Pajak -->
+                <div>
+                    <label for="pajak" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        Pajak %
+                    </label>
+                    <input type="number" name="pajak" id="pajak"
+                        value="{{ transaksi_edit.pajak|default:'' }}"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                </div>
+
+                <!-- Status -->
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        Status <span class="text-red-500">*</span>
+                    </label>
+                    <select name="status" id="status" required
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                        <option value="">Pilih Status</option>
+                        <option value="baru" {% if transaksi_edit.status == 'baru' %}selected{% endif %}>Baru</option>
+                        <option value="proses" {% if transaksi_edit.status == 'proses' %}selected{% endif %}>Proses</option>
+                        <option value="selesai" {% if transaksi_edit.status == 'selesai' %}selected{% endif %}>Selesai</option>
+                        <option value="diambil" {% if transaksi_edit.status == 'diambil' %}selected{% endif %}>Diambil</option>
+                    </select>
+                </div>
+
+                <!-- Dibayar -->
+                <div>
+                    <label for="dibayar" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        Status Pembayaran <span class="text-red-500">*</span>
+                    </label>
+                    <select name="dibayar" id="dibayar" required
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                        <option value="">Pilih Status Pembayaran</option>
+                        <option value="dibayar" {% if transaksi_edit.dibayar == 'dibayar' %}selected{% endif %}>Dibayar</option>
+                        <option value="belum_dibayar" {% if transaksi_edit.dibayar == 'belum_dibayar' %}selected{% endif %}>Belum Dibayar</option>
+                    </select>
+                </div>
+
+                <!-- Total Harga -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        Total Harga <span class="text-red-500">*</span>
+                    </label>
+                    <div id="total_harga_display" class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Rp 0
+                    </div>
+                    <input type="hidden" name="total_harga" id="total_harga" required value="{{ transaksi_edit.total_harga|default:'' }}">
+                </div>
+            </div>
+        </div>
+
+        <!-- Tombol Submit -->
+        <div class="flex justify-end gap-4 pt-6 border-t">
+            <button type="button" onclick="history.back()"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600">
+                Batal
+            </button>
+            <button type="submit"
+                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                Simpan
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Paket Selection Modal -->
+<div id="paketModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    <div class="relative min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-4xl">
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                        Pilih Paket Laundry
+                    </h3>
+                    <button onclick="closePaketModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 6 6 18M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Search dan Filter -->
+                <div class="mt-4 flex flex-col sm:flex-row gap-4">
+                    <div class="relative flex-1">
+                        <input type="text" id="searchPaket" 
+                            placeholder="Cari paket..." 
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                    </div>
+                    <select id="filterJenis" 
+                        class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                        <option value="">Semua Jenis</option>
+                        <option value="kiloan">Kiloan</option>
+                        <option value="selimut">Selimut</option>
+                        <option value="bed_cover">Bed Cover</option>
+                        <option value="kaos">Kaos</option>
+                        <option value="lainnya">Lainnya</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Modal Body with Split View -->
+            <div class="flex h-[500px]">
+                <!-- Paket List -->
+                <div class="w-1/2 p-6 border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
+                    <div class="space-y-4" id="paketList">
+                        <!-- Paket items akan di-render di sini -->
+                    </div>
+                </div>
+
+                <!-- Selected Paket & Summary -->
+                <div class="w-1/2 p-6 flex flex-col">
+                    <h4 class="font-medium text-gray-900 dark:text-white mb-4">Paket Terpilih</h4>
+                    
+                    <!-- Selected Paket List -->
+                    <div class="flex-1 overflow-y-auto mb-4">
+                        <div id="selectedPaketList" class="space-y-3">
+                            <!-- Selected paket items akan di-render di sini -->
+                        </div>
+                    </div>
+
+                    <!-- Summary -->
+                    <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-600 dark:text-gray-400">Subtotal</span>
+                            <span id="subtotalAmount" class="font-medium text-gray-900 dark:text-white">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-gray-600 dark:text-gray-400">Total Item</span>
+                            <span id="totalItems" class="font-medium text-gray-900 dark:text-white">0 item</span>
+                        </div>
+                        <button onclick="confirmPaketSelection()"
+                            class="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200">
+                            Konfirmasi Pilihan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedPakets = [];
+let allPakets = [];
+
+// Generate random invoice code
+function generateInvoiceCode() {
+    const prefix = 'INV';
+    const date = new Date().toISOString().slice(2,10).replace(/-/g, '');
+    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    return `${prefix}${date}${random}`;
+}
+
+// Format currency
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR'
+    }).format(amount);
+}
+
+// Calculate total price
+function calculateTotal() {
+    let total = selectedPakets.reduce((sum, paket) => sum + paket.harga, 0);
+    const diskon = parseFloat(document.getElementById('diskon').value) || 0;
+    const pajak = parseFloat(document.getElementById('pajak').value) || 0;
+    const biayaTambahan = parseFloat(document.getElementById('biaya_tambahan').value) || 0;
+    
+    // Add additional cost
+    total += biayaTambahan;
+    
+    // Apply discount
+    const diskonAmount = (total * diskon) / 100;
+    total -= diskonAmount;
+    
+    // Apply tax
+    const pajakAmount = (total * pajak) / 100;
+    total += pajakAmount;
+    
+    // Update hidden input dan tampilan
+    document.getElementById('total_harga').value = total;
+    document.getElementById('total_harga_display').textContent = formatCurrency(total);
+}
+
+// Tambahkan fungsi initializePaketModal() pada saat document ready
+document.addEventListener('DOMContentLoaded', function() {
+    initializeForm();
+    initializePaketModal();
+    // Inisialisasi flatpickr untuk semua input tanggal
+    const flatpickrConfig = {
+        dateFormat: "Y-m-d",
+        locale: "id",
+        allowInput: true,
+        disableMobile: false,
+        theme: "dark" // untuk dark mode
+    };
+
+    // Inisialisasi untuk setiap input tanggal
+    flatpickr("#tanggal", {
+        ...flatpickrConfig,
+        defaultDate: "today"
+    });
+    
+    flatpickr("#batas_waktu", {
+        ...flatpickrConfig,
+        minDate: "today"
+    });
+    
+    flatpickr("#tgl_bayar", flatpickrConfig);
+});
+
+// Perbaiki fungsi filterPaket()
+function filterPaket() {
+    const searchQuery = document.getElementById('searchPaket').value.toLowerCase();
+    const filterJenis = document.getElementById('filterJenis').value;
+    const paketList = document.getElementById('paketList');
+    
+    if (!paketList) return;
+    
+    const filteredPaket = allPakets.filter(paket => {
+        const matchSearch = paket.nama_paket.toLowerCase().includes(searchQuery);
+        const matchJenis = filterJenis === '' || paket.jenis === filterJenis;
+        return matchSearch && matchJenis;
+    });
+
+    renderFilteredPakets(filteredPaket, paketList);
+}
+
+// Tambahkan fungsi baru untuk render hasil filter
+function renderFilteredPakets(filteredPaket, container) {
+    if (filteredPaket.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+                Tidak ada paket yang sesuai dengan pencarian
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = filteredPaket.map(paket => {
+        const isSelected = selectedPakets.find(p => p.id === paket.id);
+        return `
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${
+                isSelected ? 'ring-2 ring-blue-500' : ''
+            }">
+                <div class="p-4">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h4 class="font-medium text-gray-900 dark:text-white">${paket.nama_paket}</h4>
+                            <div class="mt-1 flex items-center gap-2">
+                                <span class="text-sm text-gray-600 dark:text-gray-400">${formatCurrency(paket.harga)}</span>
+                                <span class="text-xs px-2 py-1 rounded-full ${getJenisClass(paket.jenis)}">
+                                    ${getJenisLabel(paket.jenis)}
+                                </span>
+                            </div>
+                            ${paket.outlet ? `
+                                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/>
+                                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                                        <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/>
+                                        <path d="M2 7h20"/>
+                                        <path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"/>
+                                    </svg>
+                                    <span>${paket.outlet.nama}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+                <button type="button" onclick="togglePaketSelection(${JSON.stringify(paket).replace(/"/g, '&quot;')})" 
+                    class="w-full px-4 py-2 text-sm ${
+                        isSelected 
+                            ? 'text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    } border-t border-gray-200 dark:border-gray-700">
+                    ${isSelected ? 'Hapus' : 'Pilih'}
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+// Perbaiki fungsi initializePaketModal()
+function initializePaketModal() {
+    const searchInput = document.getElementById('searchPaket');
+    const filterSelect = document.getElementById('filterJenis');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            filterPaket();
+        });
+    }
+
+    if (filterSelect) {
+        filterSelect.addEventListener('change', () => {
+            filterPaket();
+        });
+    }
+}
+
+// Initialize form
+async function initializeForm() {
+    // Load semua data paket
+    allPakets = JSON.parse('{{ paket_list_json|safe }}');
+    
+    {% if transaksi_edit %}
+        // Load paket yang sudah dipilih sebelumnya
+        const selectedPaketsData = '{{ transaksi_edit.selected_pakets_json|safe }}';
+        if (selectedPaketsData) {
+            try {
+                selectedPakets = JSON.parse(selectedPaketsData);
+                
+                // Update hidden input paket
+                document.getElementById('paket').value = selectedPakets.map(p => p.id).join(',');
+                
+                // Update tampilan
+                updateFormSelectedPaketList();
+                updateSelectedPaketList();
+            } catch (error) {
+                console.error('Error parsing selected pakets:', error);
+            }
+        }
+    {% else %}
+        // Generate kode invoice baru jika ini adalah form tambah
+        const kodeInvoice = generateInvoiceCode();
+        document.getElementById('kode_invoice').value = kodeInvoice;
+        document.getElementById('kode_invoice_display').textContent = kodeInvoice;
+    {% endif %}
+    
+    // Setup event listeners
+    document.getElementById('diskon').addEventListener('input', calculateTotal);
+    document.getElementById('pajak').addEventListener('input', calculateTotal);
+    document.getElementById('biaya_tambahan').addEventListener('input', calculateTotal);
+    
+    // Hitung total awal
+    calculateTotal();
+}
+
+// Fungsi untuk memilih paket
+function selectPaket(paket) {
+    // Cek apakah paket sudah dipilih
+    const isSelected = selectedPakets.find(p => p.id === paket.id);
+    
+    if (!isSelected) {
+        selectedPakets.push(paket);
+    }
+    
+    // Update tampilan
+    updatePaketList();
+    updateSelectedPaketList();
+    updateFormSelectedPaketList();
+    
+    // Update hidden input
+    document.getElementById('paket').value = selectedPakets.map(p => p.id).join(',');
+    
+    // Hitung ulang total
+    calculateTotal();
+}
+
+// Fungsi untuk menghapus paket
+function removePaket(paketId) {
+    selectedPakets = selectedPakets.filter(p => p.id !== paketId);
+    
+    // Update tampilan
+    updatePaketList();
+    updateSelectedPaketList();
+    updateFormSelectedPaketList();
+    
+    // Update hidden input
+    document.getElementById('paket').value = selectedPakets.map(p => p.id).join(',');
+    
+    // Hitung ulang total
+    calculateTotal();
+}
+
+// Fungsi untuk toggle pemilihan paket
+function togglePaketSelection(paket) {
+    const isSelected = selectedPakets.find(p => p.id === paket.id);
+    
+    if (isSelected) {
+        // Hapus paket jika sudah dipilih
+        selectedPakets = selectedPakets.filter(p => p.id !== paket.id);
+    } else {
+        // Tambah paket jika belum dipilih
+        selectedPakets.push(paket);
+    }
+    
+    // Update tampilan
+    updatePaketList();
+    updateSelectedPaketList();
+    updateFormSelectedPaketList();
+    
+    // Update hidden input
+    document.getElementById('paket').value = selectedPakets.map(p => p.id).join(',');
+    
+    // Hitung ulang total
+    calculateTotal();
+}
+
+// Update fungsi updatePaketList
+function updatePaketList() {
+    const paketContainer = document.getElementById('paketList');
+    if (!paketContainer) return;
+    
+    paketContainer.innerHTML = allPakets.map(paket => {
+        const isSelected = selectedPakets.find(p => p.id === paket.id);
+        return `
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${
+                isSelected ? 'ring-2 ring-blue-500' : ''
+            }" data-paket-id="${paket.id}">
+                <div class="p-4">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <h4 class="font-medium text-gray-900 dark:text-white">${paket.nama_paket}</h4>
+                            <div class="mt-1 flex items-center gap-2">
+                                <span class="text-sm text-gray-600 dark:text-gray-400">${formatCurrency(paket.harga)}</span>
+                                <span class="text-xs px-2 py-1 rounded-full ${getJenisClass(paket.jenis)}">
+                                    ${getJenisLabel(paket.jenis)}
+                                </span>
+                            </div>
+                            ${paket.outlet ? `
+                                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/>
+                                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                                        <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/>
+                                        <path d="M2 7h20"/>
+                                        <path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"/>
+                                    </svg>
+                                    <span>${paket.outlet.nama}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+                <button type="button" onclick="togglePaketSelection(${JSON.stringify(paket).replace(/"/g, '&quot;')})" 
+                    class="w-full px-4 py-2 text-sm ${
+                        isSelected 
+                            ? 'text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    } border-t border-gray-200 dark:border-gray-700">
+                    ${isSelected ? 'Hapus' : 'Pilih'}
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+// Fungsi helper untuk label jenis paket
+function getJenisLabel(jenis) {
+    const labels = {
+        'kiloan': 'Kiloan',
+        'selimut': 'Selimut',
+        'bed_cover': 'Bed Cover',
+        'kaos': 'Kaos',
+        'lainnya': 'Lainnya'
+    };
+    return labels[jenis] || jenis;
+}
+
+// Fungsi helper untuk styling badge jenis paket
+function getJenisClass(jenis) {
+    const classes = {
+        'kiloan': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+        'selimut': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+        'bed_cover': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+        'kaos': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+        'lainnya': 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
+    };
+    return classes[jenis] || classes.lainnya;
+}
+
+// Fungsi helper untuk format tanggal
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('id-ID', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function closePaketModal() {
+    document.getElementById('paketModal').classList.add('hidden');
+}
+
+function confirmPaketSelection() {
+    if (selectedPakets.length > 0) {
+        const paketInput = document.getElementById('paket');
+        const totalHargaInput = document.getElementById('total_harga');
+        
+        // Update input paket dengan ID paket yang dipilih
+        paketInput.value = selectedPakets.map(p => p.id).join(',');
+        
+        // Update tampilan paket terpilih di form
+        updateFormSelectedPaketList();
+        
+        // Hitung total harga dari semua paket yang dipilih
+        const totalHarga = selectedPakets.reduce((sum, p) => sum + p.harga, 0);
+        totalHargaInput.value = Math.round(totalHarga);
+        
+        // Update perhitungan total dengan diskon dan pajak
+        calculateTotal();
+    }
+    closePaketModal();
+}
+
+// Fungsi baru untuk update tampilan paket terpilih di form
+function updateFormSelectedPaketList() {
+    const formSelectedList = document.getElementById('formSelectedPaketList');
+    
+    if (selectedPakets.length === 0) {
+        formSelectedList.innerHTML = `
+            <div class="text-sm text-gray-500 dark:text-gray-400 italic">
+                Belum ada paket dipilih
+            </div>
+        `;
+        return;
+    }
+    
+    formSelectedList.innerHTML = selectedPakets.map(paket => `
+        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 relative group">
+            <div class="flex justify-between items-start">
+                <div class="flex-1">
+                    <h5 class="font-medium text-gray-900 dark:text-white">${paket.nama_paket}</h5>
+                    <div class="mt-1 flex items-center gap-2">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">${formatCurrency(paket.harga)}</span>
+                        <span class="text-xs px-2 py-1 rounded-full ${getJenisClass(paket.jenis)}">
+                            ${getJenisLabel(paket.jenis)}
+                        </span>
+                    </div>
+                    ${paket.outlet ? `
+                        <div class="mt-1 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/>
+                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                                <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/>
+                                <path d="M2 7h20"/>
+                                <path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"/>
+                            </svg>
+                            <span>${paket.outlet.nama}</span>
+                        </div>
+                    ` : ''}
+                </div>
+                <button type="button" onclick="removeFormPaket(${paket.id})" 
+                    class="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 6 6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Fungsi baru untuk menghapus paket dari form
+function removeFormPaket(paketId) {
+    selectedPakets = selectedPakets.filter(p => p.id !== paketId);
+    updateFormSelectedPaketList();
+    
+    // Update hidden input dan total
+    const paketInput = document.getElementById('paket');
+    paketInput.value = selectedPakets.map(p => p.id).join(',');
+    
+    const totalHarga = selectedPakets.reduce((sum, p) => sum + p.harga, 0);
+    document.getElementById('total_harga').value = totalHarga;
+    
+    calculateTotal();
+}
+
+// Fungsi untuk memperbarui tampilan paket terpilih di modal
+function updateSelectedPaketList() {
+    const selectedList = document.getElementById('selectedPaketList');
+    const subtotalAmount = document.getElementById('subtotalAmount');
+    const totalItems = document.getElementById('totalItems');
+    
+    if (selectedPakets.length === 0) {
+        selectedList.innerHTML = `
+            <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+                Belum ada paket dipilih
+            </div>
+        `;
+        subtotalAmount.textContent = formatCurrency(0);
+        totalItems.textContent = '0 item';
+        return;
+    }
+    
+    selectedList.innerHTML = selectedPakets.map(paket => `
+        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+            <div class="flex justify-between items-start">
+                <div class="flex-1">
+                    <h5 class="font-medium text-gray-900 dark:text-white">${paket.nama_paket}</h5>
+                    <div class="mt-1 flex items-center gap-2">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">${formatCurrency(paket.harga)}</span>
+                        <span class="text-xs px-2 py-1 rounded-full ${getJenisClass(paket.jenis)}">
+                            ${getJenisLabel(paket.jenis)}
+                        </span>
+                    </div>
+                    ${paket.outlet ? `
+                        <div class="mt-1 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/>
+                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                                <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/>
+                                <path d="M2 7h20"/>
+                                <path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"/>
+                            </svg>
+                            <span>${paket.outlet.nama}</span>
+                        </div>
+                    ` : ''}
+                </div>
+                <button type="button" onclick="removePaket(${paket.id})" 
+                    class="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 6 6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    `).join('');
+    
+    // Update summary
+    const subtotal = selectedPakets.reduce((sum, p) => sum + p.harga, 0);
+    subtotalAmount.textContent = formatCurrency(subtotal);
+    totalItems.textContent = `${selectedPakets.length} item`;
+}
+
+// Fungsi untuk menampilkan modal paket
+function showPaketModal() {
+    const modal = document.getElementById('paketModal');
+    modal.classList.remove('hidden');
+    
+    // Initialize search dan filter
+    filterPaket();
+    updateSelectedPaketList();
+}
+</script>
+

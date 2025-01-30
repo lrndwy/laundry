@@ -1,0 +1,62 @@
+<div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+    <h2 class="text-xl font-bold mb-6">{% if pelanggan_edit %}Form Edit Pelanggan{% else %}Form Tambah Pelanggan{% endif %}</h2>
+    
+    <form method="POST" action="" class="space-y-6">
+        {% csrf_token %}
+
+        {% if pelanggan_edit %}
+            <input type="hidden" name="pelanggan_id" value="{{ pelanggan_edit.id }}">
+        {% endif %}
+        
+        <!-- Grid untuk 2 kolom -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Kolom Kiri -->
+            <div class="space-y-6">
+                <!-- Nama -->
+                <div>
+                    <label for="nama" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        Nama <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="nama" id="nama" required
+                        value="{{ pelanggan_edit.nama|default:'' }}"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                </div>
+
+                <!-- No HP -->
+                <div>
+                    <label for="no_hp" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        No. HP <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="no_hp" id="no_hp" required
+                        value="{{ pelanggan_edit.no_hp|default:'' }}"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                </div>
+            </div>
+
+            <!-- Kolom Kanan -->
+            <div class="space-y-6">
+                <!-- Alamat -->
+                <div>
+                    <label for="alamat" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        Alamat <span class="text-red-500">*</span>
+                    </label>
+                    <textarea name="alamat" id="alamat" required
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                        rows="3">{{ pelanggan_edit.alamat|default:'' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tombol Submit -->
+        <div class="flex justify-end gap-4 pt-6 border-t">
+            <button type="button" onclick="history.back()"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600">
+                Batal
+            </button>
+            <button type="submit"
+                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                Simpan
+            </button>
+        </div>
+    </form>
+</div>

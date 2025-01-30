@@ -1,0 +1,1009 @@
+<div class="w-full min-h-[400px] bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden flex flex-col justify-between">
+    <!-- Table Header with Search and Filters -->
+    <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <!-- Search -->
+            <div class="relative flex-1">
+                <input 
+                    type="text" 
+                    id="{{ table_id }}_search"
+                    placeholder="Search..."
+                    class="w-full px-14 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all duration-200 shadow-sm hover:shadow-md"
+                >
+            </div>
+
+            <!-- Export & Print Buttons -->
+            <div class="flex gap-2">
+                <!-- Export Dropdown -->
+                <div class="relative" id="{{ table_id }}_exportContainer" {% if not show_export %}style="display: none;"{% endif %}>
+                    <button 
+                        id="{{ table_id }}_exportButton"
+                        class="px-6 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500/50 flex items-center gap-3 transition-all duration-200 shadow-sm hover:shadow-md"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                        </svg>
+                        <span>Ekspor</span>
+                    </button>
+                    
+                    <!-- Export Popup -->
+                    <div id="{{ table_id }}_exportPopup" class="hidden absolute right-0 mt-3 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50">
+                        <div class="py-2">
+                            <button 
+                                onclick="exportTable('{{ table_id }}', 'csv')"
+                                class="w-full px-4 py-2 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <span>Ekspor CSV</span>
+                            </button>
+                            <button 
+                                onclick="exportTable('{{ table_id }}', 'excel')"
+                                class="w-full px-4 py-2 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18v18H3zM9 3v18m6-18v18M3 9h18M3 15h18" />
+                                </svg>
+                                <span>Ekspor Excel</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Print Button -->
+                <div class="relative" {% if not show_print %}style="display: none;"{% endif %}>
+                    <button 
+                        onclick="printTable('{{ table_id }}')"
+                        class="px-6 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500/50 flex items-center gap-3 transition-all duration-200 shadow-sm hover:shadow-md"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        <span>Cetak</span>
+                    </button>
+                </div>
+
+                <!-- Filter Button & Popup -->
+                <div class="relative" {% if not show_filter %}style="display: none;"{% endif %}>
+                    <button 
+                        id="{{ table_id }}_filterButton"
+                        class="px-6 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500/50 flex items-center gap-3 transition-all duration-200 shadow-sm hover:shadow-md"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                        </svg>
+                        <span>Filter</span>
+                    </button>
+                    
+                    <!-- Filter Popup -->
+                    <div id="{{ table_id }}_filterPopup" class="hidden absolute right-0 mt-3 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 transform transition-all duration-200 ease-out">
+                        <div class="p-4 space-y-4" id="{{ table_id }}_filterContainer">
+                            <!-- Filter elements will be generated here -->
+                        </div>
+                        <div class="border-t border-gray-200 dark:border-gray-700 p-4 flex justify-end gap-2">
+                            <button 
+                                id="clearFilters"
+                                class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                            >
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Content -->
+    <div class="overflow-x-auto flex-grow">
+        <!-- Tambahkan div wrapper untuk responsif -->
+        <div class="min-w-full inline-block align-middle">
+            <div class="overflow-hidden">
+                <!-- Skeleton Loading -->
+                <div id="{{ table_id }}_skeletonLoading" class="hidden">
+                    <div class="animate-pulse">
+                        <!-- Skeleton Header -->
+                        <div class="bg-gray-50 dark:bg-gray-700">
+                            <div class="flex">
+                                {% for column in table_column %}
+                                <div class="px-4 sm:px-6 py-3 flex-1">
+                                    <div class="h-4 bg-gray-200 dark:bg-gray-600 rounded w-3/4"></div>
+                                </div>
+                                {% endfor %}
+                                <div class="px-4 sm:px-6 py-3 w-24">
+                                    <div class="h-4 bg-gray-200 dark:bg-gray-600 rounded"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Skeleton Rows -->
+                        <div class="bg-white dark:bg-gray-800">
+                            {% for i in '123456'|make_list %}
+                            <div class="flex border-b border-gray-200 dark:border-gray-700">
+                                {% for column in table_column %}
+                                <div class="px-4 sm:px-6 py-4 flex-1">
+                                    <div class="h-4 bg-gray-100 dark:bg-gray-700 rounded"></div>
+                                </div>
+                                {% endfor %}
+                                <div class="px-4 sm:px-6 py-4 w-24">
+                                    <div class="flex gap-2">
+                                        <div class="h-5 w-5 bg-gray-100 dark:bg-gray-700 rounded"></div>
+                                        <div class="h-5 w-5 bg-gray-100 dark:bg-gray-700 rounded"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actual Table -->
+                <table class="min-w-full" id="{{ table_id }}_mainTable">
+                    <thead class="bg-gray-50/50 dark:bg-gray-700/50 backdrop-blur-sm sticky top-0">
+                        <tr>
+                            {% for column in table_column %}
+                            <th class="px-6 py-4 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                                {{ column }}
+                            </th>
+                            {% endfor %}
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700" id="{{ table_id }}_tableBody">
+                        {% for row in table_data %}
+                        <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-all duration-200 cursor-pointer" onclick="showDetailModal('{{ table_id }}', {{ forloop.counter0 }})">
+                            {% for column in table_column %}
+                            <td class="px-6 py-4 whitespace-normal sm:whitespace-nowrap text-sm text-gray-600 text-center dark:text-gray-300">
+                                {{ row|get_item:column }}
+                            </td>
+                            {% endfor %}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex gap-3">
+                                    <button 
+                                        onclick="event.stopPropagation(); window.location.href='?editId={{ row|get_item:'id' }}'"
+                                        class="p-2 rounded-lg hover:bg-green-50 dark:hover:bg-green-500/10 text-green-500 transition-all duration-200"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </button>
+                                    <button 
+                                        onclick="event.stopPropagation(); window.location.href='?deleteId={{ row|get_item:'id' }}'"
+                                        class="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all duration-200"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Footer with Pagination -->
+    <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <!-- Items Per Page & Total -->
+            <div class="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
+                <select 
+                    id="{{ table_id }}_itemsPerPage"
+                    class="px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all duration-200"
+                >
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+                <span>items per page</span>
+                <span class="mx-3">|</span>
+                <span>Showing <span id="{{ table_id }}_startItem">1</span>-<span id="{{ table_id }}_endItem">10</span> of <span id="{{ table_id }}_totalItems">100</span> items</span>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex items-center gap-2">
+                <button 
+                    class="p-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500/50 disabled:opacity-50 transition-all duration-200 shadow-sm hover:shadow-md"
+                    id="{{ table_id }}_prevPage"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                
+                <div class="flex items-center gap-2" id="{{ table_id }}_paginationNumbers">
+                    <!-- Page numbers will be inserted here dynamically -->
+                </div>
+
+                <button 
+                    class="p-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500/50 disabled:opacity-50 transition-all duration-200 shadow-sm hover:shadow-md"
+                    id="{{ table_id }}_nextPage"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail -->
+    <div id="{{ table_id }}_detailModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+                <!-- Modal Header -->
+                <div class="p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                            Detail Data
+                        </h3>
+                        <button onclick="hideDetailModal('{{ table_id }}')" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Modal Body -->
+                <div class="flex-1 overflow-y-auto">
+                    <div class="p-6 space-y-4" id="{{ table_id }}_detailContent">
+                        <!-- Content will be dynamically inserted here -->
+                    </div>
+                </div>
+                
+                <!-- Modal Footer -->
+                <div class="p-6 border-t border-gray-200 dark:border-gray-700 sticky bottom-0 bg-white dark:bg-gray-800 z-10">
+                    <div class="flex justify-end gap-2">
+                        <button 
+                            onclick="printDetail('{{ table_id }}')"
+                            class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                            </svg>
+                            Cetak
+                        </button>
+                        <button 
+                            onclick="hideDetailModal('{{ table_id }}')"
+                            class="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg transition-colors duration-200"
+                        >
+                            Tutup
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+class Table {
+    constructor(options = {}) {
+        this.tableId = options.tableId;
+        this.data = options.data || [];
+        this.columns = options.columns || [];
+        this.filteredData = [...this.data];
+        this.currentPage = 1;
+        this.itemsPerPage = 10;
+        this.filters = {};
+        this.filterDefinitions = options.filters || [];
+        this.tempFilters = {}; // Untuk menyimpan filter sementara
+        this.isLoading = true; // Tambahkan state loading
+        this.detailFields = options.detailFields || this.columns;
+        this.detailLabels = options.detailLabels || {};
+        this.detailConfig = options.detailConfig || {};
+        
+        this.init();
+    }
+
+    init() {
+        this.showLoading(); // Tampilkan loading saat inisialisasi
+        this.setupFilters();
+        this.setupEventListeners();
+        
+        // Simulasi loading data
+        setTimeout(() => {
+            this.isLoading = false;
+            this.hideLoading();
+            this.render();
+        }, 1000);
+    }
+
+    showLoading() {
+        document.getElementById(`${this.tableId}_skeletonLoading`).classList.remove('hidden');
+        document.getElementById(`${this.tableId}_mainTable`).classList.add('hidden');
+    }
+
+    hideLoading() {
+        document.getElementById(`${this.tableId}_skeletonLoading`).classList.add('hidden');
+        document.getElementById(`${this.tableId}_mainTable`).classList.remove('hidden');
+    }
+
+    setupFilters() {
+        const filterContainer = document.getElementById(`${this.tableId}_filterContainer`);
+        filterContainer.innerHTML = '';
+
+        this.filterDefinitions.forEach(filter => {
+            const filterGroup = document.createElement('div');
+            filterGroup.className = 'space-y-2';
+            
+            const label = document.createElement('label');
+            label.className = 'block text-sm font-medium text-gray-700 dark:text-gray-300 text-left';
+            label.textContent = filter.label || filter.field;
+            
+            const select = document.createElement('select');
+            select.className = 'w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500';
+            select.setAttribute('data-filter', filter.field);
+
+            // Tambahkan opsi default
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = `Pilih ${filter.label || filter.field}`;
+            select.appendChild(defaultOption);
+
+            // Generate options dari data yang unik
+            const uniqueValues = [...new Set(this.data.map(item => item[filter.field]))];
+            uniqueValues.forEach(value => {
+                if (value) { // Hanya tambahkan jika value tidak null/undefined
+                    const optionElement = document.createElement('option');
+                    optionElement.value = value;
+                    optionElement.textContent = value;
+                    select.appendChild(optionElement);
+                }
+            });
+
+            filterGroup.appendChild(label);
+            filterGroup.appendChild(select);
+            filterContainer.appendChild(filterGroup);
+
+            // Tambahkan event listener untuk setiap filter
+            select.addEventListener('change', (e) => {
+                const value = e.target.value;
+                if (!value) {
+                    delete this.filters[filter.field];
+                } else {
+                    this.filters[filter.field] = value;
+                }
+                this.applyAllFilters();
+            });
+        });
+    }
+
+    setupEventListeners() {
+        // Search
+        document.getElementById(`${this.tableId}_search`).addEventListener('input', (e) => {
+            this.handleSearch(e.target.value);
+        });
+
+        // Filter button
+        const filterButton = document.getElementById(`${this.tableId}_filterButton`);
+        const filterPopup = document.getElementById(`${this.tableId}_filterPopup`);
+        
+        filterButton.addEventListener('click', () => {
+            filterPopup.classList.toggle('hidden');
+        });
+
+        // Close popup when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!filterButton.contains(e.target) && !filterPopup.contains(e.target)) {
+                filterPopup.classList.add('hidden');
+            }
+        });
+
+        // Clear filters
+        const clearFilters = filterPopup.querySelector('#clearFilters');
+        clearFilters.addEventListener('click', () => {
+            this.filters = {};
+            filterPopup.querySelectorAll('[data-filter]').forEach(filter => {
+                filter.value = '';
+            });
+            this.applyAllFilters();
+            filterPopup.classList.add('hidden');
+        });
+
+        // Items per page
+        document.getElementById(`${this.tableId}_itemsPerPage`).addEventListener('change', (e) => {
+            this.itemsPerPage = parseInt(e.target.value);
+            this.currentPage = 1;
+            this.updateStats();
+            this.render();
+        });
+
+        // Pagination
+        document.getElementById(`${this.tableId}_prevPage`).addEventListener('click', () => {
+            if (this.currentPage > 1) {
+                this.currentPage--;
+                this.render();
+            }
+        });
+
+        document.getElementById(`${this.tableId}_nextPage`).addEventListener('click', () => {
+            if (this.currentPage < this.getTotalPages()) {
+                this.currentPage++;
+                this.render();
+            }
+        });
+    }
+
+    handleSearch(query) {
+        this.showLoading(); // Tampilkan loading saat pencarian
+        setTimeout(() => {
+            if (!query) {
+                this.filteredData = [...this.data];
+            } else {
+                query = query.toLowerCase();
+                this.filteredData = this.data.filter(item => {
+                    return Object.values(item).some(value => 
+                        String(value).toLowerCase().includes(query)
+                    );
+                });
+            }
+            this.hideLoading();
+            this.currentPage = 1;
+            this.render();
+        }, 500);
+    }
+
+    handleFilter(filterName, value) {
+        this.showLoading(); // Tampilkan loading saat filter
+        setTimeout(() => {
+            if (!value) {
+                delete this.filters[filterName];
+            } else {
+                this.filters[filterName] = value;
+            }
+
+            this.filteredData = this.data.filter(item => {
+                return Object.entries(this.filters).every(([key, value]) => {
+                    return String(item[key]) === value;
+                });
+            });
+
+            this.hideLoading();
+            this.currentPage = 1;
+            this.render();
+        }, 500);
+    }
+
+    getTotalPages() {
+        return Math.ceil(this.filteredData.length / this.itemsPerPage);
+    }
+
+    getCurrentPageData() {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        const end = start + this.itemsPerPage;
+        return this.filteredData.slice(start, end);
+    }
+
+    renderTableBody() {
+        const tbody = document.getElementById(`${this.tableId}_tableBody`);
+        tbody.innerHTML = '';
+
+        const currentData = this.getCurrentPageData();
+
+        currentData.forEach((item, index) => {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-all duration-200 cursor-pointer';
+            tr.onclick = () => this.showDetailModal(index);
+            
+            let tdContent = '';
+            this.columns.forEach(column => {
+                const value = item[column] || '-';
+                tdContent += `
+                    <td class="px-6 py-4 whitespace-normal sm:whitespace-nowrap text-sm text-gray-600 text-center dark:text-gray-300">
+                        ${value}
+                    </td>
+                `;
+            });
+            
+            tdContent += `
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex gap-3">
+                        <button 
+                            onclick="event.stopPropagation(); window.location.href='?editId=${item.id}'"
+                            class="p-2 rounded-lg hover:bg-green-50 dark:hover:bg-green-500/10 text-green-500 transition-all duration-200"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </button>
+                        <button 
+                            onclick="event.stopPropagation(); window.location.href='?deleteId=${item.id}'"
+                            class="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500 transition-all duration-200"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </td>
+            `;
+            
+            tr.innerHTML = tdContent;
+            tbody.appendChild(tr);
+        });
+
+    }
+
+    renderPagination() {
+        const totalPages = this.getTotalPages();
+        const paginationNumbers = document.getElementById(`${this.tableId}_paginationNumbers`);
+        paginationNumbers.innerHTML = '';
+
+        // Previous button state
+        document.getElementById(`${this.tableId}_prevPage`).disabled = this.currentPage === 1;
+
+        // Next button state
+        document.getElementById(`${this.tableId}_nextPage`).disabled = this.currentPage === totalPages;
+
+        // Tentukan halaman yang akan ditampilkan
+        let startPage = Math.max(1, this.currentPage - 1);
+        let endPage = Math.min(startPage + 2, totalPages);
+        
+        // Sesuaikan startPage jika endPage kurang dari 3 halaman
+        if (endPage - startPage < 2) {
+            startPage = Math.max(1, endPage - 2);
+        }
+
+        // Generate page numbers
+        for (let i = startPage; i <= endPage; i++) {
+            const button = document.createElement('button');
+            button.className = `px-3 py-1 rounded-lg ${
+                i === this.currentPage
+                    ? 'bg-green-500 text-white'
+                    : 'border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600'
+            } focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all duration-200`;
+            button.textContent = i;
+            button.addEventListener('click', () => {
+                this.currentPage = i;
+                this.render();
+            });
+            paginationNumbers.appendChild(button);
+        }
+    }
+
+    updateStats() {
+        const start = this.filteredData.length === 0 ? 0 : (this.currentPage - 1) * this.itemsPerPage + 1;
+        const end = Math.min((this.currentPage - 1) * this.itemsPerPage + this.itemsPerPage, this.filteredData.length);
+        const total = this.filteredData.length;
+
+        document.getElementById(`${this.tableId}_startItem`).textContent = start;
+        document.getElementById(`${this.tableId}_endItem`).textContent = end;
+        document.getElementById(`${this.tableId}_totalItems`).textContent = total;
+    }
+
+    render() {
+        this.renderTableBody();
+        this.renderPagination();
+        this.updateStats();
+    }
+
+    applyAllFilters() {
+        this.filteredData = this.data.filter(item => {
+            return Object.entries(this.filters).every(([key, value]) => {
+                return String(item[key]) === value;
+            });
+        });
+
+        this.currentPage = 1;
+        this.render();
+    }
+
+    showDetailModal(index) {
+        const currentData = this.getCurrentPageData();
+        const item = currentData[index];
+        
+        if (!item) {
+            console.error('Data tidak ditemukan');
+            return;
+        }
+        
+        const modal = document.getElementById(`${this.tableId}_detailModal`);
+        const content = document.getElementById(`${this.tableId}_detailContent`);
+        
+        let detailHTML = '';
+        
+        // Jika ada pengelompokan
+        if (this.detailConfig.groups) {
+            Object.entries(this.detailConfig.groups).forEach(([groupName, fields]) => {
+                detailHTML += `
+                    <div class="mb-6">
+                        <h4 class="text-lg text-left font-semibold text-gray-900 dark:text-white mb-4">${groupName}</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                `;
+                
+                // Ubah bagian ini untuk menggunakan fields dari group
+                fields.forEach(field => {
+                    const label = this.detailConfig.labels[field] || field;
+                    detailHTML += `
+                        <div class="flex flex-col gap-1">
+                            <span class="text-sm text-left font-medium text-gray-500 dark:text-gray-400">
+                                ${label}
+                            </span>
+                            <span class="text-base text-gray-900 dark:text-white">
+                                ${field === 'detail_transaksi' 
+                                    ? item[field].map(detail => 
+                                        `
+                                        <div class="mb-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                                </svg>
+                                                <span class="font-medium">${detail.paket}</span>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-gray-500">Harga:</span>
+                                                    <span>Rp ${detail.harga.toLocaleString()}</span>
+                                                </div>
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-gray-500">Jenis:</span>
+                                                    <span>${detail.jenis}</span>
+                                                </div>
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-gray-500">Outlet:</span>
+                                                    <span>${detail.outlet}</span>
+                                                </div>
+                                            </div>
+                                        </div>`
+                                      ).join('')
+                                    : item[field] || '-'}
+                            </span>
+                        </div>
+                    `;
+                });
+                
+                detailHTML += `
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            // Fallback ke tampilan tanpa grup
+            detailHTML = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+            // Gunakan fields dari detailConfig
+            this.detailConfig.fields.forEach(field => {
+                const label = this.detailConfig.labels[field] || field;
+                detailHTML += `
+                    <div class="flex flex-col gap-1">
+                        <span class="text-sm text-left font-medium text-gray-500 dark:text-gray-400">
+                            ${label}
+                        </span>
+                        <span class="text-base text-left text-gray-900 dark:text-white">
+                            ${field === 'detail_transaksi' 
+                                ? item[field].map(detail => 
+                                    `<div class="mb-2">
+                                        <div>Paket: ${detail.paket}</div>
+                                    </div>`
+                                  ).join('')
+                                : item[field] || '-'}
+                        </span>
+                    </div>
+                `;
+            });
+            detailHTML += '</div>';
+        }
+        
+        content.innerHTML = detailHTML;
+        modal.classList.remove('hidden');
+    }
+
+    exportToCSV() {
+        const headers = this.columns;
+        const rows = this.filteredData;
+        
+        let csvContent = headers.join(',') + '\n';
+        
+        rows.forEach(row => {
+            const values = headers.map(header => {
+                const value = row[header] || '';
+                // Escape quotes and wrap in quotes if contains comma
+                return `"${String(value).replace(/"/g, '""')}"`;
+            });
+            csvContent += values.join(',') + '\n';
+        });
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', `${this.tableId}_export.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    exportToExcel() {
+        const headers = this.columns;
+        const rows = this.filteredData;
+        
+        let xlsContent = '<table><tr>';
+        // Add headers
+        headers.forEach(header => {
+            xlsContent += `<th>${header}</th>`;
+        });
+        xlsContent += '</tr>';
+        
+        // Add rows
+        rows.forEach(row => {
+            xlsContent += '<tr>';
+            headers.forEach(header => {
+                xlsContent += `<td>${row[header] || ''}</td>`;
+            });
+            xlsContent += '</tr>';
+        });
+        xlsContent += '</table>';
+        
+        const blob = new Blob([xlsContent], { type: 'application/vnd.ms-excel' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', `${this.tableId}_export.xls`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+// Simpan instance tabel dalam objek
+const tableInstances = {};
+
+// Fungsi global untuk menangani modal
+function showDetailModal(tableId, index) {
+    if (tableInstances[tableId]) {
+        tableInstances[tableId].showDetailModal(index);
+    }
+}
+
+// Fungsi global untuk ekspor
+function exportTable(tableId, format) {
+    const table = tableInstances[tableId];
+    if (!table) return;
+    
+    if (format === 'csv') {
+        table.exportToCSV();
+    } else if (format === 'excel') {
+        table.exportToExcel();
+    }
+    
+    // Sembunyikan popup setelah ekspor
+    document.getElementById(`${tableId}_exportPopup`).classList.add('hidden');
+}
+
+// Tambahkan event listener untuk tombol ekspor
+document.addEventListener('DOMContentLoaded', function() {
+    // Cari semua tabel yang memiliki ID yang diakhiri dengan '_mainTable'
+    const tables = document.querySelectorAll('table[id$="_mainTable"]');
+    
+    tables.forEach(table => {
+        const tableId = table.id.replace('_mainTable', '');
+        const exportButton = document.getElementById(`${tableId}_exportButton`);
+        const exportPopup = document.getElementById(`${tableId}_exportPopup`);
+        
+        if (exportButton && exportPopup) {
+            exportButton.addEventListener('click', () => {
+                exportPopup.classList.toggle('hidden');
+            });
+
+            // Tutup popup saat klik di luar
+            document.addEventListener('click', (e) => {
+                if (!exportButton.contains(e.target) && !exportPopup.contains(e.target)) {
+                    exportPopup.classList.add('hidden');
+                }
+            });
+        }
+    });
+});
+
+// Fungsi printTable yang diperbarui
+function printTable(tableId) {
+    const table = tableInstances[tableId];
+    if (!table) return;
+    
+    const data = table.filteredData;
+    const columns = table.columns;
+    
+    // Buat iframe untuk mencetak
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+    
+    // Generate HTML untuk tabel
+    let printContent = `
+        <html>
+            <head>
+                <title>Print Table</title>
+                <style>
+                    body { font-family: Arial, sans-serif; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+                    th, td { 
+                        border: 1px solid #ddd; 
+                        padding: 8px; 
+                        text-align: left; 
+                    }
+                    th { 
+                        background-color: #f8f9fa;
+                        font-weight: bold;
+                    }
+                    tr:nth-child(even) { background-color: #f2f2f2; }
+                    @media print {
+                        @page { margin: 1cm; }
+                    }
+                </style>
+            </head>
+            <body>
+                <h2 style="text-align: center; margin-bottom: 20px;">Data Table</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            ${columns.map(col => `<th>${col}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(row => `
+                            <tr>
+                                ${columns.map(col => `<td>${row[col] || '-'}</td>`).join('')}
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </body>
+        </html>
+    `;
+    
+    iframe.contentDocument.write(printContent);
+    iframe.contentDocument.close();
+    
+    iframe.onload = function() {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        
+        setTimeout(() => {
+            document.body.removeChild(iframe);
+        }, 500);
+    };
+}
+
+function hideDetailModal(tableId) {
+    document.getElementById(`${tableId}_detailModal`).classList.add('hidden');
+}
+
+// Contoh penggunaan dengan data dari Django
+// const tableData = {{ table_data|safe }};
+// const tableColumns = {{ table_column|safe }};
+
+//const table = new Table({
+//    tableId: 'laundryTable',
+//    data: tableData,
+//    columns: tableColumns,
+//    filters: [
+//        {
+//            field: 'status',
+//            label: 'Status'
+//        },
+//        {
+//            field: 'jenis_laundry',
+//            label: 'Jenis Laundry'
+//        }
+//    ]
+//});
+
+// Tambahkan fungsi print di bawah fungsi hideDetailModal
+function printDetail(tableId) {
+    const content = document.getElementById(`${tableId}_detailContent`).innerHTML;
+    
+    // Buat elemen iframe tersembunyi
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+    
+    // Tulis konten ke iframe dengan style yang diperbarui
+    iframe.contentDocument.write(`
+        <html>
+            <head>
+                <title>Detail Data</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        padding: 20px;
+                    }
+                    .grid {
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 1rem;
+                    }
+                    .mb-6 {
+                        margin-bottom: 1.5rem;
+                    }
+                    h4 {
+                        margin: 0 0 1rem 0;
+                        font-size: 1.2rem;
+                        font-weight: bold;
+                    }
+                    .text-sm {
+                        font-size: 0.875rem;
+                        color: #666;
+                    }
+                    .text-base {
+                        font-size: 1rem;
+                        color: #000;
+                    }
+                    /* Tambahkan style untuk ikon */
+                    svg {
+                        width: 12px !important;
+                        height: 12px !important;
+                        vertical-align: middle;
+                    }
+                    /* Style untuk container detail transaksi */
+                    .mb-2 {
+                        margin-bottom: 0.5rem;
+                    }
+                    .p-3 {
+                        padding: 0.75rem;
+                    }
+                    .bg-gray-50 {
+                        background-color: #f9fafb;
+                    }
+                    .rounded-lg {
+                        border-radius: 0.5rem;
+                    }
+                    .gap-1 {
+                        gap: 0.25rem;
+                    }
+                    .gap-2 {
+                        gap: 0.5rem;
+                    }
+                    .text-gray-500 {
+                        color: #6b7280;
+                    }
+                    @media print {
+                        @page {
+                            margin: 1cm;
+                        }
+                        svg {
+                            width: 12px !important;
+                            height: 12px !important;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <h2 style="text-align: center; margin-bottom: 20px;">Detail Data</h2>
+                ${content}
+            </body>
+        </html>
+    `);
+    
+    iframe.contentDocument.close();
+    
+    // Tunggu sampai konten dimuat
+    iframe.onload = function() {
+        // Cetak iframe
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        
+        // Hapus iframe setelah selesai
+        setTimeout(() => {
+            document.body.removeChild(iframe);
+        }, 500);
+    };
+}
+</script>

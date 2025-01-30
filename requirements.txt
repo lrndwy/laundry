@@ -1,0 +1,14 @@
+asgiref==3.8.1
+click==8.1.8
+colorama==0.4.6
+Django==5.1.5
+django-cotton==1.5.2
+django-environ==0.12.0
+ldjango==8.5
+prompt_toolkit==3.0.48
+python-dateutil==2.9.0.post0
+six==1.17.0
+sqlparse==0.5.3
+tqdm==4.67.1
+wcwidth==0.2.13
+whitenoise==6.8.2

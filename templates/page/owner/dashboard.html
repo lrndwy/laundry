@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<div class="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <c-dashboard-layouts></c-dashboard-layouts>
+    
+    <!-- Main Content -->
+    <main class="p-4 sm:p-6 lg:p-8 sm:ml-64 overflow-y-auto flex-1">
+        <div class="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+            <!-- Header Dashboard -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="w-full sm:w-auto">
+                    <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">Laporan Bisnis</h1>
+                    <p class="text-sm sm:text-base text-gray-600">Analisis lengkap performa bisnis laundry Anda</p>
+                </div>
+                
+                <div class="flex gap-3">
+                    <!-- Tambahkan tombol Cetak Laporan -->
+                    <a 
+                        href="{% url 'cetak_laporan' %}?start={{ start_date }}&end={{ end_date }}" 
+                        class="w-full sm:w-auto text-white bg-blue-500 px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors print-hide inline-flex items-center gap-2"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        Cetak Laporan
+                    </a>
+                    
+                    <!-- Filter Date Range -->
+                    <div class="w-full sm:w-auto print-hide">
+                        <form method="GET" class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <input 
+                                    type="text" 
+                                    name="start" 
+                                    value="{{ start_date|default:'' }}"
+                                    class="w-full text-sm bg-white border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 flatpickr-date px-3 py-2"
+                                    placeholder="Tanggal Awal"
+                                >
+                                <span class="text-gray-400 hidden sm:inline">-</span>
+                                <input 
+                                    type="text" 
+                                    name="end"
+                                    value="{{ end_date|default:'' }}" 
+                                    class="w-full text-sm bg-white border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 flatpickr-date px-3 py-2"
+                                    placeholder="Tanggal Akhir"
+                                >
+                            </div>
+                            <button type="submit" class="w-full sm:w-auto text-white bg-blue-500 px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                                Filter
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistik Overview Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                <!-- Total Pendapatan -->
+                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <div class="flex justify-between items-start">
+                        <div class="space-y-2">
+                            <p class="text-sm font-medium text-gray-600">Total Pendapatan</p>
+                            <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800">Rp {{ stats.total_pendapatan|intcomma }}</h3>
+                        </div>
+                        <div class="p-2 sm:p-3 bg-green-100 rounded-lg">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sisanya card statistik serupa untuk total_transaksi, total_outlet, dll -->
+            </div>
+
+            <!-- Grafik Performa Bisnis -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                <!-- Grafik Pendapatan -->
+                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">Tren Pendapatan</h3>
+                    <div id="revenueChart" class="h-60 sm:h-80"></div>
+                </div>
+
+                <!-- Grafik Transaksi -->
+                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">Tren Transaksi</h3>
+                    <div id="transactionChart" class="h-60 sm:h-80"></div>
+                </div>
+            </div>
+
+            <!-- Performa Per Outlet -->
+            <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm overflow-hidden">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">Performa Outlet</h3>
+                <div class="overflow-x-auto -mx-4 sm:-mx-6">
+                    <div class="inline-block min-w-full align-middle">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Outlet</th>
+                                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Pendapatan</th>
+                                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Transaksi</th>
+                                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rata-rata Transaksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {% for outlet in outlet_stats %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">{{ outlet.nama }}</td>
+                                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">Rp {{ outlet.pendapatan|default:0|intcomma }}</td>
+                                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">{{ outlet.jumlah_transaksi|default:0 }}</td>
+                                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">Rp {{ outlet.rata_rata_transaksi|default:0|intcomma }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Tambahkan CDN html2pdf sebelum script lainnya -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+// Inisialisasi grafik menggunakan ApexCharts
+document.addEventListener('DOMContentLoaded', function() {
+    const chartData = {{ chart_data|safe }};
+    
+    // Grafik Pendapatan
+    const revenueOptions = {
+        chart: {
+            type: 'area',
+            height: 320,
+            toolbar: { show: false }
+        },
+        series: [{
+            name: 'Pendapatan',
+            data: chartData.pendapatan
+        }],
+        xaxis: {
+            categories: chartData.labels
+        },
+        stroke: {
+            curve: 'smooth',
+            width: 2
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.7,
+                opacityTo: 0.3
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        colors: ['#4F46E5']
+    };
+    
+    // Grafik Transaksi
+    const transactionOptions = {
+        chart: {
+            type: 'bar',
+            height: 320,
+            toolbar: { show: false }
+        },
+        series: [{
+            name: 'Transaksi',
+            data: chartData.transaksi
+        }],
+        xaxis: {
+            categories: chartData.labels
+        },
+        plotOptions: {
+            bar: {
+                borderRadius: 4,
+                horizontal: false,
+                columnWidth: '60%'
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        colors: ['#10B981']
+    };
+    
+    new ApexCharts(document.querySelector("#revenueChart"), revenueOptions).render();
+    new ApexCharts(document.querySelector("#transactionChart"), transactionOptions).render();
+});
+
+// Fungsi untuk export PDF
+document.getElementById('export-pdf').addEventListener('click', function() {
+    // Konfigurasi PDF
+    const opt = {
+        margin: 1,
+        filename: 'laporan-bisnis.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+    };
+
+    // Pilih elemen yang akan di-export
+    const element = document.querySelector('.max-w-7xl');
+
+    // Generate PDF
+    html2pdf().set(opt).from(element).save().catch(err => console.error('Error generating PDF:', err));
+});
+
+// Inisialisasi date picker
+flatpickr(".flatpickr-date", {
+    dateFormat: "Y-m-d",
+    locale: "id",
+    altInput: true,
+    altFormat: "d F Y",
+    defaultDate: "today"
+});
+</script>
+
+<style>
+    @media print {
+        /* Reset margin dan padding */
+        @page {
+            margin: 1cm;
+        }
+        
+        /* Styling untuk konten cetak */
+        .print-content {
+            display: block !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .print-hide {
+            display: none !important;
+        }
+        
+        /* Header cetak */
+        .print-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        /* Statistik cards */
+        .grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 1rem !important;
+            page-break-inside: avoid;
+        }
+        
+        /* Grafik */
+        #revenueChart, #transactionChart {
+            height: 300px !important;
+            margin-bottom: 1rem;
+            page-break-inside: avoid;
+        }
+        
+        /* Tabel */
+        table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            page-break-inside: auto;
+        }
+        
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+        
+        th, td {
+            padding: 8px !important;
+            border: 1px solid #ddd !important;
+        }
+        
+        /* Sembunyikan semua tombol dan elemen yang tidak perlu */
+        button,
+        .flatpickr-calendar,
+        nav,
+        .navbar,
+        form,
+        [onclick],
+        .print-hide,
+        a[href],
+        input,
+        select,
+        .btn,
+        .button,
+        [role="button"],
+        [type="button"],
+        [type="submit"],
+        [type="reset"],
+        .filter-section,
+        .action-buttons,
+        .form-controls {
+            display: hidden !important;
+        }
+        
+        /* Pastikan warna background tercetak */
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+            background-color: white !important;
+            color: black !important;
+        }
+        
+        /* Hapus shadow dan efek hover */
+        * {
+            box-shadow: none !important;
+            text-shadow: none !important;
+        }
+        
+        /* Hapus margin dan padding yang tidak perlu */
+        .p-4, .p-6, .p-8 {
+            padding: 0 !important;
+        }
+        
+        /* Pastikan konten penting tetap terlihat */
+        .text-gray-800,
+        .text-gray-600,
+        .font-bold,
+        .font-semibold {
+            color: black !important;
+        }
+    }
+</style>
+{% endblock %}
