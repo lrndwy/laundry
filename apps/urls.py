@@ -10,6 +10,7 @@ urlpatterns = [
 	path("admin/transaksi", admin_transaksi, name="admin_transaksi"),
 	path("admin/pengguna", admin_pengguna, name="admin_pengguna"),
  
+ 
  path('kasir/dashboard', kasir_dashboard, name='kasir_dashboard'),
  path('kasir/member', kasir_member, name='kasir_member'),
  path('kasir/transaksi', kasir_transaksi, name='kasir_transaksi'),
@@ -19,7 +20,7 @@ urlpatterns = [
  
  
  path('owner/dashboard/', owner_dashboard, name='owner_dashboard'),
- path('owner/cetak-laporan/', cetak_laporan, name='cetak_laporan'),
+ path('cetak-laporan/', cetak_laporan, name='cetak_laporan'),
  
  
  

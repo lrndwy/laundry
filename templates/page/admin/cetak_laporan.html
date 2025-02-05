@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<div class="print-content">
+    <!-- Tambahkan tombol print manual dan back -->
+    <div class="print-hide text-right mb-4 p-4 flex justify-end gap-4">
+        <a 
+            href="javascript:history.back()" 
+            class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors inline-flex items-center gap-2"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Kembali
+        </a>
+        <button 
+            onclick="window.print()" 
+            class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors inline-flex items-center gap-2"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Cetak
+        </button>
+    </div>
+
+    <!-- Header Laporan -->
+    <div class="print-header">
+        <h1 class="text-2xl font-bold mb-2">Laporan Bisnis LaundryKu</h1>
+        <p class="text-gray-600 mb-4">Periode: {{ start_date }} s/d {{ end_date }}</p>
+    </div>
+
+    <!-- Statistik Overview Cards -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+        <!-- Total Pendapatan -->
+        <div class="bg-white p-4 border border-gray-200 rounded-lg">
+            <div class="flex justify-between items-start">
+                <div class="space-y-2">
+                    <p class="text-sm font-medium text-gray-600">Total Pendapatan</p>
+                    <h3 class="text-xl font-bold text-gray-800">Rp {{ stats.total_pendapatan|intcomma }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Transaksi -->
+        <div class="bg-white p-4 border border-gray-200 rounded-lg">
+            <div class="flex justify-between items-start">
+                <div class="space-y-2">
+                    <p class="text-sm font-medium text-gray-600">Total Transaksi</p>
+                    <h3 class="text-xl font-bold text-gray-800">{{ stats.total_transaksi }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grafik Performa Bisnis -->
+    <div class="grid grid-cols-1 gap-6 mb-6">
+        <!-- Grafik Pendapatan -->
+        <div class="bg-white p-4 border border-gray-200 rounded-lg">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Tren Pendapatan</h3>
+            <div id="revenueChart" class="h-80"></div>
+        </div>
+
+        <!-- Grafik Transaksi -->
+        <div class="bg-white p-4 border border-gray-200 rounded-lg">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Tren Transaksi</h3>
+            <div id="transactionChart" class="h-80"></div>
+        </div>
+    </div>
+
+    <!-- Performa Per Outlet -->
+    <div class="bg-white p-4 border border-gray-200 rounded-lg">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Performa Outlet</h3>
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Outlet</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Pendapatan</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah Transaksi</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rata-rata Transaksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for outlet in outlet_stats %}
+                <tr>
+                    <td class="px-4 py-4 text-sm">{{ outlet.nama }}</td>
+                    <td class="px-4 py-4 text-sm">Rp {{ outlet.pendapatan|default:0|intcomma }}</td>
+                    <td class="px-4 py-4 text-sm">{{ outlet.jumlah_transaksi|default:0 }}</td>
+                    <td class="px-4 py-4 text-sm">Rp {{ outlet.rata_rata_transaksi|default:0|intcomma }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chartData = {{ chart_data|safe }};
+    
+    // Grafik Pendapatan
+    const revenueOptions = {
+        chart: {
+            type: 'area',
+            height: 320,
+            toolbar: { show: false }
+        },
+        series: [{
+            name: 'Pendapatan',
+            data: chartData.pendapatan
+        }],
+        xaxis: {
+            categories: chartData.labels
+        },
+        stroke: {
+            curve: 'smooth',
+            width: 2
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.7,
+                opacityTo: 0.3
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        colors: ['#4F46E5']
+    };
+    
+    // Grafik Transaksi
+    const transactionOptions = {
+        chart: {
+            type: 'bar',
+            height: 320,
+            toolbar: { show: false }
+        },
+        series: [{
+            name: 'Transaksi',
+            data: chartData.transaksi
+        }],
+        xaxis: {
+            categories: chartData.labels
+        },
+        plotOptions: {
+            bar: {
+                borderRadius: 4,
+                horizontal: false,
+                columnWidth: '60%'
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        colors: ['#10B981']
+    };
+    
+    new ApexCharts(document.querySelector("#revenueChart"), revenueOptions).render();
+    new ApexCharts(document.querySelector("#transactionChart"), transactionOptions).render();
+    
+    // Kurangi delay print menjadi 500ms untuk membuat lebih responsif
+    setTimeout(() => {
+        window.print();
+    }, 500);
+});
+
+// Tambahkan event listener untuk window.onload
+window.onload = function() {
+    // Backup print jika DOMContentLoaded belum memicu print
+    setTimeout(() => {
+        window.print();
+    }, 800);
+};
+</script>
+
+<style>
+@media print {
+    @page {
+        size: landscape;
+        margin: 1cm;
+    }
+    
+    .print-hide {
+        display: none !important;
+    }
+    
+    body {
+        background: white;
+    }
+    
+    .print-content {
+        padding: 20px;
+    }
+    
+    .print-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
+</style>
+{% endblock %}

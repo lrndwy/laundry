@@ -1,0 +1,32 @@
+Table User {
+  username varchar
+  password varchar
+  email varchar
+  role varchar
+  outlet varchar
+  is_active boolean
+}
+
+Table Pelanggan {
+  nama varchar
+  alamat text
+  no_hp varchar
+  created_at date 
+}
+
+Table Outlet {
+  nama varchar
+  alamat text 
+  telp varchar  
+  created_at date 
+}
+
+Table Paket {
+  outlet varchar  
+  jenis varchar 
+  nama_paket varchar  
+  harga varchar 
+  created_at date 
+}
+
+

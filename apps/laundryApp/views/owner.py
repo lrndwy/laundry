@@ -109,7 +109,6 @@ def owner_dashboard(request):
     return render(request, 'page/owner/dashboard.html', context)
 
 @login_required
-@user_passes_test(is_owner)
 def cetak_laporan(request):
     start = request.GET.get('start')
     end = request.GET.get('end')

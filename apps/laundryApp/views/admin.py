@@ -5,12 +5,13 @@ from django.contrib import messages
 from apps.laundryApp.models import Outlet, Transaksi, DetailTransaksi, Paket, Member, Pelanggan
 import json
 from django.db.models import Q
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.db import models
 from django.utils import timezone
 from django.db.models.functions import TruncDate
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Avg
+
 
 User = get_user_model()
 
@@ -34,73 +35,65 @@ def get_user_data(user=None):
 @login_required
 @user_passes_test(is_admin)
 def admin_dashboard(request):
+    # Filter tanggal
     start = request.GET.get('start')
     end = request.GET.get('end')
     
+    # Default 7 hari terakhir jika tidak ada filter tanggal
+    if not start and not end:
+        end_date = timezone.now().date()
+        start_date = end_date - timedelta(days=6)  # 6 hari sebelumnya untuk total 7 hari
+        start = start_date.strftime('%Y-%m-%d')
+        end = end_date.strftime('%Y-%m-%d')
+    
     # Base queryset
     transaksi_qs = Transaksi.objects.filter(dibayar='dibayar')
-    pelanggan_qs = Pelanggan.objects.all()
-    member_qs = Member.objects.all()
     
-    # Terapkan filter tanggal jika ada
-    if start and end:
-        try:
-            start_date = datetime.strptime(start, '%Y-%m-%d').date()
-            end_date = datetime.strptime(end, '%Y-%m-%d').date()
-            
-            transaksi_qs = transaksi_qs.filter(created_at__date__range=[start_date, end_date])
-            pelanggan_qs = pelanggan_qs.filter(tanggal_waktu__date__range=[start_date, end_date])
-            member_qs = member_qs.filter(created_at__date__range=[start_date, end_date])
-        except ValueError:
-            messages.error(request, 'Format tanggal tidak valid')
-  
-    # Menghitung total dari setiap model
-    total_pendapatan = transaksi_qs.aggregate(total=Sum('total_harga'))['total'] or 0
-    total_pelanggan = pelanggan_qs.count()
-    total_paket = Paket.objects.count() 
-    total_member = member_qs.count()
-    total_transaksi = transaksi_qs.count()
-    total_outlet = Outlet.objects.count()
-    
-    # Menghitung rata-rata per bulan
-    satu_bulan_lalu = timezone.now() - relativedelta(months=1)
-    
-    rata_rata_pendapatan = transaksi_qs.filter(
-        created_at__gte=satu_bulan_lalu
-    ).aggregate(avg=models.Avg('total_harga'))['avg'] or 0
-    
-    rata_rata_pelanggan = pelanggan_qs.filter(
-        tanggal_waktu__gte=satu_bulan_lalu
-    ).count()
-    
-    rata_rata_transaksi = transaksi_qs.filter(
-        created_at__gte=satu_bulan_lalu
-    ).count()
-    
-    rata_rata_member = member_qs.filter(
-        created_at__gte=satu_bulan_lalu
-    ).count()
-
-    # Menambahkan data untuk grafik transaksi
-    if start and end:
+    try:
         start_date = datetime.strptime(start, '%Y-%m-%d').date()
         end_date = datetime.strptime(end, '%Y-%m-%d').date()
-    else:
-        # Default seminggu terakhir
+        transaksi_qs = transaksi_qs.filter(created_at__date__range=[start_date, end_date])
+    except (ValueError, TypeError):
+        # Jika format tanggal tidak valid, gunakan 7 hari terakhir
         end_date = timezone.now().date()
-        start_date = end_date - timezone.timedelta(days=6)  # 6 hari sebelumnya untuk total 7 hari
+        start_date = end_date - timedelta(days=6)
+        transaksi_qs = transaksi_qs.filter(created_at__date__range=[start_date, end_date])
+        start = start_date.strftime('%Y-%m-%d')
+        end = end_date.strftime('%Y-%m-%d')
 
-    # Buat list tanggal lengkap untuk seminggu
+    # Statistik Umum
+    stats = {
+        'total_pendapatan': transaksi_qs.aggregate(Sum('total_harga'))['total_harga__sum'] or 0,
+        'total_transaksi': transaksi_qs.count(),
+        'total_outlet': Outlet.objects.count(),
+        'total_member': Member.objects.count(),
+        'total_pelanggan': Pelanggan.objects.count(),
+        'total_paket': Paket.objects.count(),
+        'total_user': User.objects.count(),
+    }
+    
+    # Statistik per Outlet
+    outlet_stats = Outlet.objects.annotate(
+        pendapatan=Sum('transaksi__total_harga', 
+                      filter=models.Q(transaksi__dibayar='dibayar', 
+                                    transaksi__created_at__date__range=[start_date, end_date])),
+        jumlah_transaksi=Count('transaksi', 
+                              filter=models.Q(transaksi__dibayar='dibayar',
+                                            transaksi__created_at__date__range=[start_date, end_date])),
+        rata_rata_transaksi=Avg('transaksi__total_harga', 
+                               filter=models.Q(transaksi__dibayar='dibayar',
+                                             transaksi__created_at__date__range=[start_date, end_date]))
+    )
+
+    # Buat list tanggal lengkap untuk rentang waktu yang dipilih
     date_list = []
     current_date = start_date
     while current_date <= end_date:
         date_list.append(current_date)
-        current_date += timezone.timedelta(days=1)
+        current_date += timedelta(days=1)
 
-    # Ambil data transaksi
-    transaksi_per_hari = transaksi_qs.filter(
-        created_at__date__range=[start_date, end_date]
-    ).annotate(
+    # Data untuk grafik dengan data harian
+    daily_data = transaksi_qs.annotate(
         tgl=TruncDate('created_at')
     ).values('tgl').annotate(
         total=Count('id'),
@@ -108,41 +101,34 @@ def admin_dashboard(request):
     ).order_by('tgl')
 
     # Convert queryset ke dictionary untuk akses lebih mudah
-    transaksi_dict = {t['tgl']: {'total': t['total'], 'pendapatan': t['pendapatan']} for t in transaksi_per_hari}
+    transaksi_dict = {d['tgl']: {'total': d['total'], 'pendapatan': d['pendapatan']} for d in daily_data}
 
     # Format data untuk grafik dengan semua tanggal
     chart_data = {
-        'dates': [],
-        'totals': [],
-        'pendapatan': []
+        'labels': [],
+        'pendapatan': [],
+        'transaksi': []
     }
 
     for date in date_list:
-        chart_data['dates'].append(date.strftime('%d %B %Y'))
+        chart_data['labels'].append(date.strftime('%d %B %Y'))
         if date in transaksi_dict:
-            chart_data['totals'].append(transaksi_dict[date]['total'])
+            chart_data['transaksi'].append(transaksi_dict[date]['total'])
             chart_data['pendapatan'].append(float(transaksi_dict[date]['pendapatan']))
         else:
-            chart_data['totals'].append(0)
+            chart_data['transaksi'].append(0)
             chart_data['pendapatan'].append(0)
 
     context = {
-        'total_pendapatan': total_pendapatan,
-        'total_pelanggan': total_pelanggan, 
-        'total_paket': total_paket,
-        'total_member': total_member,
-        'total_transaksi': total_transaksi,
-        'total_outlet': total_outlet,
-        'rata_rata_pendapatan': rata_rata_pendapatan,
-        'rata_rata_pelanggan': rata_rata_pelanggan,
-        'rata_rata_transaksi': rata_rata_transaksi,
-        'rata_rata_member': rata_rata_member,
+        'stats': stats,
+        'outlet_stats': outlet_stats,
+        'chart_data': json.dumps(chart_data),
         'start_date': start,
-        'end_date': end,
-        'chart_data': json.dumps(chart_data)
+        'end_date': end
     }
     
     return render(request, 'page/admin/dashboard.html', context)
+
 
 @login_required
 @user_passes_test(is_admin)
