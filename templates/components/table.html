@@ -1,3 +1,5 @@
+{% load custom_filters %}
+
 <div class="w-full min-h-[400px] bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden flex flex-col justify-between">
     <!-- Table Header with Search and Filters -->
     <div class="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -157,7 +159,13 @@
                         <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-all duration-200 cursor-pointer" onclick="showDetailModal('{{ table_id }}', {{ forloop.counter0 }})">
                             {% for column in table_column %}
                             <td class="px-6 py-4 whitespace-normal sm:whitespace-nowrap text-sm text-gray-600 text-center dark:text-gray-300">
-                                {{ row|get_item:column }}
+                                {% with value=row|get_item:column %}
+                                    {% if value|stringformat:"s"|slice:":7" == "/media/" %}
+                                        <img src="{{ value }}" alt="Image" class="w-10 h-10 object-cover rounded-lg mx-auto">
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                {% endwith %}
                             </td>
                             {% endfor %}
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -504,7 +512,9 @@ class Table {
                 const value = item[column] || '-';
                 tdContent += `
                     <td class="px-6 py-4 whitespace-normal sm:whitespace-nowrap text-sm text-gray-600 text-center dark:text-gray-300">
-                        ${value}
+                        ${value.toString().startsWith('/media/') 
+                            ? `<img src="${value}" alt="Image" class="w-10 h-10 object-cover rounded-lg mx-auto">`
+                            : value}
                     </td>
                 `;
             });

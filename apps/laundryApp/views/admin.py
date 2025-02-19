@@ -19,7 +19,6 @@ def is_admin(user):
     return user.role == 'admin'
 
 def get_user_data(user=None):
-    """Fungsi helper untuk mendapatkan data user untuk form"""
     if user:
         return {
             'id': user.id,
@@ -27,7 +26,8 @@ def get_user_data(user=None):
             'email': user.email,
             'role': user.role,
             'outlet': user.outlet.id if user.outlet else None,
-            'is_active': user.is_active
+            'is_active': user.is_active,
+            'profile_image': user.profile_image.url if user.profile_image else ''
         }
     return None
 
@@ -736,7 +736,6 @@ def format_transaksi_data(transaksi):
 def admin_pengguna(request):
     user_edit = None
     
-    # Handle POST request untuk create/update
     if request.method == 'POST':
         user_id = request.POST.get('user_id')
         
@@ -749,6 +748,10 @@ def admin_pengguna(request):
             'is_active': request.POST.get('is_active') == 'on'
         }
         
+        # Handle profile image
+        if request.FILES.get('profile_image'):
+            user_data['profile_image'] = request.FILES['profile_image']
+            
         # Jika password diisi
         if request.POST.get('password'):
             user_data['password'] = request.POST.get('password')
@@ -792,23 +795,26 @@ def admin_pengguna(request):
     users = User.objects.all()
     data_user = []
     for user in users:
+        profile_image_url = user.profile_image.url if user.profile_image else ''
         data_user.append({
-            'id': user.id,
+            'profile_image': profile_image_url,
+            'id': str(user.id),
             'username': user.username,
             'email': user.email,
             'role': user.role,
             'outlet': user.outlet.nama if user.outlet else '-',
             'is_active': 'Aktif' if user.is_active else 'Tidak Aktif',
-            'last_login': user.last_login.strftime('%Y-%m-%d %H:%M:%S') if user.last_login else '-'
+            'last_login': user.last_login.strftime('%Y-%m-%d %H:%M:%S') if user.last_login else '-',
         })
     
     # Definisikan kolom tabel
-    kolom_table_user = ['id', 'username', 'email', 'role', 'outlet', 'is_active', 'last_login']
+    kolom_table_user = ['profile_image', 'id', 'username', 'email', 'role', 'outlet', 'is_active', 'last_login']
     
     # Konfigurasi detail untuk modal
     detail_config_user = {
-        'fields': ['id', 'username', 'email', 'role', 'outlet', 'is_active', 'last_login'],
+        'fields': ['profile_image', 'id', 'username', 'email', 'role', 'outlet', 'is_active', 'last_login'],
         'labels': {
+            'profile_image': 'Foto Profil:',
             'id': 'ID:',
             'username': 'Username:',
             'email': 'Email:',
@@ -818,7 +824,7 @@ def admin_pengguna(request):
             'last_login': 'Login Terakhir:'
         },
         'groups': {
-            'Informasi Akun:': ['username', 'email', 'role'],
+            'Informasi Akun:': ['profile_image', 'username', 'email', 'role'],
             'Status & Outlet:': ['is_active', 'outlet'],
             'Info Login:': ['last_login']
         }

@@ -59,6 +59,7 @@ class User(AbstractUser):
     
     outlet = models.ForeignKey(Outlet, null=True, blank=True, on_delete=models.SET_NULL)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='admin')
+    profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if self.role == 'admin':
@@ -138,7 +139,11 @@ class DetailTransaksi(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.transaksi.kode_invoice
+        # Karena ini many-to-many, kita perlu mengambil transaksi pertama
+        transaksi_pertama = self.transaksi.first()
+        if transaksi_pertama:
+            return transaksi_pertama.kode_invoice
+        return f"Detail Transaksi {self.id}"
       
     class Meta:
         verbose_name_plural = 'Detail Transaksi'

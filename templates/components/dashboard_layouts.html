@@ -1,15 +1,24 @@
+{% load static %}
+
 <nav class="navbar bg-base-100 max-sm:rounded-box max-sm:shadow sm:border-b border-base-content/25 sm:z-[1] min-h-16 relative">
   <button type="button" class="btn btn-text max-sm:btn-square sm:hidden me-2" aria-haspopup="dialog" aria-expanded="false" aria-controls="default-sidebar" data-overlay="#default-sidebar" >
     <span class="icon-[tabler--menu-2] size-5"></span>
   </button>
   <div class="flex flex-1 items-center">
-    <a class="link text-base-content link-neutral text-xl font-semibold no-underline" href="#">
-      LaundryKu
+    <a class="link text-base-content link-neutral no-underline" href="#">
+      <img class="h-8 w-auto" src="{% static 'images/LaundryKu.png' %}" alt="LaundryKu">
     </a>
   </div>
   <div class="navbar-end flex items-center gap-4">
     <div class="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
-      <button id="dropdown-scrollable" type="button" class="dropdown-toggle flex items-center" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
+      <button id="dropdown-scrollable" type="button" class="dropdown-toggle flex items-center gap-2" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
+        {% if user.profile_image %}
+          <img src="{{ user.profile_image.url }}" alt="Profile Image" class="w-8 h-8 rounded-full object-cover">
+        {% else %}
+          <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+            <span class="icon-[tabler--user] size-5 text-gray-500"></span>
+          </div>
+        {% endif %}
         <span class="text-base-content text-base font-semibold">{{ user.username }}</span>
       </button>
       <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-60" role="menu" aria-orientation="vertical" aria-labelledby="dropdown-avatar">
