@@ -19,7 +19,7 @@
                     </label>
                     {% if user_edit.profile_image %}
                         <div class="mb-2">
-                            <img src="{{ user_edit.profile_image.url }}" alt="Current profile image" class="w-32 h-32 object-cover rounded-lg">
+                            <img src="{{ user_edit.profile_image }}" alt="Current profile image" class="w-32 h-32 object-cover rounded-lg">
                         </div>
                     {% endif %}
                     <input type="file" name="profile_image" id="profile_image" accept="image/*"

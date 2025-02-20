@@ -51,7 +51,7 @@
                           <option value="">Pilih Member</option>
                           {% for m in members %}
                               <option value="{{ m.id }}" {% if transaksi_edit.member.id == m.id %}selected{% endif %}>
-                                  {{ m.nama }}
+                                  {{ m.nama_member }}
                               </option>
                           {% endfor %}
                       </select>
@@ -114,8 +114,7 @@
                     <label for="tanggal" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                         Tanggal <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="tanggal" id="tanggal" required
-                        placeholder="YYYY-MM-DD"
+                    <input type="date" name="tanggal" id="tanggal" required
                         value="{{ transaksi_edit.tanggal|default:'' }}"
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
                 </div>
@@ -125,9 +124,9 @@
                     <label for="batas_waktu" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                         Batas Waktu <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="batas_waktu" id="batas_waktu" required
-                        placeholder="YYYY-MM-DD"
+                    <input type="date" name="batas_waktu" id="batas_waktu" required
                         value="{{ transaksi_edit.batas_waktu|default:'' }}"
+                        min="{{ today_date|date:'Y-m-d' }}"
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
                 </div>
             </div>
@@ -139,8 +138,7 @@
                     <label for="tgl_bayar" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                         Tanggal Bayar
                     </label>
-                    <input type="text" name="tgl_bayar" id="tgl_bayar"
-                        placeholder="YYYY-MM-DD"
+                    <input type="date" name="tgl_bayar" id="tgl_bayar"
                         value="{{ transaksi_edit.tgl_bayar|default:'' }}"
                         class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
                 </div>
@@ -355,27 +353,12 @@ function calculateTotal() {
 document.addEventListener('DOMContentLoaded', function() {
     initializeForm();
     initializePaketModal();
-    // Inisialisasi flatpickr untuk semua input tanggal
-    const flatpickrConfig = {
-        dateFormat: "Y-m-d",
-        locale: "id",
-        allowInput: true,
-        disableMobile: false,
-        theme: "dark" // untuk dark mode
-    };
-
-    // Inisialisasi untuk setiap input tanggal
-    flatpickr("#tanggal", {
-        ...flatpickrConfig,
-        defaultDate: "today"
-    });
     
-    flatpickr("#batas_waktu", {
-        ...flatpickrConfig,
-        minDate: "today"
-    });
-    
-    flatpickr("#tgl_bayar", flatpickrConfig);
+    // Set default value untuk tanggal ke hari ini jika form tambah
+    if (!document.getElementById('tanggal').value) {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('tanggal').value = today;
+    }
 });
 
 // Perbaiki fungsi filterPaket()
