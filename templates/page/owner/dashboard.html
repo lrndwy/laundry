@@ -3,119 +3,121 @@
 {% load humanize %}
 
 {% block content %}
-<div class="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+<div class="flex flex-col h-screen bg-gray-100">
     <c-dashboard-layouts></c-dashboard-layouts>
     
     <!-- Main Content -->
     <main class="p-4 sm:p-6 lg:p-8 sm:ml-64 overflow-y-auto flex-1">
-        <div class="max-w-7xl mx-auto space-y-4 sm:space-y-6">
-            <!-- Header Dashboard -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div class="w-full sm:w-auto">
-                    <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">Laporan Bisnis</h1>
-                    <p class="text-sm sm:text-base text-gray-600">Analisis lengkap performa bisnis laundry Anda</p>
-                </div>
-                
-                <div class="flex gap-3">
-                    <!-- Tambahkan tombol Cetak Laporan -->
-                    <a 
-                        href="{% url 'cetak_laporan' %}?start={{ start_date }}&end={{ end_date }}" 
-                        class="w-full sm:w-auto text-white bg-blue-500 px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors print-hide inline-flex items-center gap-2"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                        </svg>
-                        Cetak Laporan
-                    </a>
+        <div class="p-6 bg-white rounded-xl shadow-sm border-2 border border-gray-300">
+            <div class="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+                <!-- Header Dashboard -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div class="w-full sm:w-auto">
+                        <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">Laporan Bisnis</h1>
+                        <p class="text-sm sm:text-base text-gray-600">Analisis lengkap performa bisnis laundry Anda</p>
+                    </div>
                     
-                    <!-- Filter Date Range -->
-                    <div class="w-full sm:w-auto print-hide">
-                        <form method="GET" class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                            <div class="flex items-center gap-2 w-full sm:w-auto">
-                                <input 
-                                    type="text" 
-                                    name="start" 
-                                    value="{{ start_date|default:'' }}"
-                                    class="w-full text-sm bg-white border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 flatpickr-date px-3 py-2"
-                                    placeholder="Tanggal Awal"
-                                >
-                                <span class="text-gray-400 hidden sm:inline">-</span>
-                                <input 
-                                    type="text" 
-                                    name="end"
-                                    value="{{ end_date|default:'' }}" 
-                                    class="w-full text-sm bg-white border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 flatpickr-date px-3 py-2"
-                                    placeholder="Tanggal Akhir"
-                                >
-                            </div>
-                            <button type="submit" class="w-full sm:w-auto text-white bg-blue-500 px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
-                                Filter
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Statistik Overview Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                <!-- Total Pendapatan -->
-                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <div class="flex justify-between items-start">
-                        <div class="space-y-2">
-                            <p class="text-sm font-medium text-gray-600">Total Pendapatan</p>
-                            <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800">Rp {{ stats.total_pendapatan|intcomma }}</h3>
-                        </div>
-                        <div class="p-2 sm:p-3 bg-green-100 rounded-lg">
-                            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <div class="flex gap-3">
+                        <!-- Tambahkan tombol Cetak Laporan -->
+                        <a 
+                            href="{% url 'cetak_laporan' %}?start={{ start_date }}&end={{ end_date }}" 
+                            class="w-full sm:w-auto text-white bg-blue-500 px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors print-hide inline-flex items-center gap-2"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                             </svg>
+                            Cetak Laporan
+                        </a>
+                        
+                        <!-- Filter Date Range -->
+                        <div class="w-full sm:w-auto print-hide">
+                            <form method="GET" class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                                <div class="flex items-center gap-2 w-full sm:w-auto">
+                                    <input 
+                                        type="text" 
+                                        name="start" 
+                                        value="{{ start_date|default:'' }}"
+                                        class="w-full text-sm bg-white border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 flatpickr-date px-3 py-2"
+                                        placeholder="Tanggal Awal"
+                                    >
+                                    <span class="text-gray-400 hidden sm:inline">-</span>
+                                    <input 
+                                        type="text" 
+                                        name="end"
+                                        value="{{ end_date|default:'' }}" 
+                                        class="w-full text-sm bg-white border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 flatpickr-date px-3 py-2"
+                                        placeholder="Tanggal Akhir"
+                                    >
+                                </div>
+                                <button type="submit" class="w-full sm:w-auto text-white bg-blue-500 px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                                    Filter
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
 
-                <!-- Sisanya card statistik serupa untuk total_transaksi, total_outlet, dll -->
-            </div>
+                <!-- Statistik Overview Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                    <!-- Total Pendapatan -->
+                    <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
+                        <div class="flex justify-between items-start">
+                            <div class="space-y-2">
+                                <p class="text-sm font-medium text-gray-600">Total Pendapatan</p>
+                                <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800">Rp {{ stats.total_pendapatan|intcomma }}</h3>
+                            </div>
+                            <div class="p-2 sm:p-3 bg-green-100 rounded-lg">
+                                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
 
-            <!-- Grafik Performa Bisnis -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                <!-- Grafik Pendapatan -->
-                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
-                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">Tren Pendapatan</h3>
-                    <div id="revenueChart" class="h-60 sm:h-80"></div>
+                    <!-- Sisanya card statistik serupa untuk total_transaksi, total_outlet, dll -->
                 </div>
 
-                <!-- Grafik Transaksi -->
-                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
-                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">Tren Transaksi</h3>
-                    <div id="transactionChart" class="h-60 sm:h-80"></div>
-                </div>
-            </div>
+                <!-- Grafik Performa Bisnis -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                    <!-- Grafik Pendapatan -->
+                    <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">Tren Pendapatan</h3>
+                        <div id="revenueChart" class="h-60 sm:h-80"></div>
+                    </div>
 
-            <!-- Performa Per Outlet -->
-            <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm overflow-hidden">
-                <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">Performa Outlet</h3>
-                <div class="overflow-x-auto -mx-4 sm:-mx-6">
-                    <div class="inline-block min-w-full align-middle">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead>
-                                <tr>
-                                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Outlet</th>
-                                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Pendapatan</th>
-                                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Transaksi</th>
-                                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rata-rata Transaksi</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                {% for outlet in outlet_stats %}
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">{{ outlet.nama }}</td>
-                                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">Rp {{ outlet.pendapatan|default:0|intcomma }}</td>
-                                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">{{ outlet.jumlah_transaksi|default:0 }}</td>
-                                    <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">Rp {{ outlet.rata_rata_transaksi|default:0|intcomma }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <!-- Grafik Transaksi -->
+                    <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">Tren Transaksi</h3>
+                        <div id="transactionChart" class="h-60 sm:h-80"></div>
+                    </div>
+                </div>
+
+                <!-- Performa Per Outlet -->
+                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm overflow-hidden">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-4">Performa Outlet</h3>
+                    <div class="overflow-x-auto -mx-4 sm:-mx-6">
+                        <div class="inline-block min-w-full align-middle">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Outlet</th>
+                                        <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Pendapatan</th>
+                                        <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Transaksi</th>
+                                        <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rata-rata Transaksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    {% for outlet in outlet_stats %}
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">{{ outlet.nama }}</td>
+                                        <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">Rp {{ outlet.pendapatan|default:0|intcomma }}</td>
+                                        <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">{{ outlet.jumlah_transaksi|default:0 }}</td>
+                                        <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">Rp {{ outlet.rata_rata_transaksi|default:0|intcomma }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

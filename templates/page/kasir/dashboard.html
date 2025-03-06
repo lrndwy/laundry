@@ -3,171 +3,173 @@
 {% load humanize %}
 
 {% block content %}
-<div class="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+<div class="flex flex-col min-h-screen bg-gray-100">
     <c-dashboard-layouts></c-dashboard-layouts>
     
     <!-- Main Content -->
     <main class="p-4 sm:p-6 lg:p-8 sm:ml-64 overflow-y-auto flex-1">
-        <div class="space-y-6">
-            <!-- Header Dashboard -->
-            <div class="flex justify-between items-center">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
-                    <p class="text-gray-600">Selamat datang kembali, lihat statistik terbaru Anda</p>
-                </div>
-                
-                <!-- Filter Date Range Modern -->
-                <div class="relative">
-                    <form method="GET" class="flex items-center gap-3">
-                        <div class="relative">
-                            <input 
-                                type="text" 
-                                name="start" 
-                                value="{{ start_date }}"
-                                class="text-sm bg-white border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200 flatpickr-date"
-                                placeholder="Tanggal Awal"
-                            >
-                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        <div class="p-6 bg-white rounded-xl shadow-sm border-2 border border-gray-300">
+            <div class="space-y-6">
+                <!-- Header Dashboard -->
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Dashboard Kasir</h1>
+                        <p class="text-gray-600">Selamat datang kembali, lihat statistik terbaru Anda</p>
+                    </div>
+                    
+                    <!-- Filter Date Range Modern -->
+                    <div class="relative">
+                        <form method="GET" class="flex items-center gap-3">
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    name="start" 
+                                    value="{{ start_date }}"
+                                    class="text-sm bg-white border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200 flatpickr-date"
+                                    placeholder="Tanggal Awal"
+                                >
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </span>
+                            </div>
+
+                            <span class="text-gray-400">-</span>
+
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    name="end"
+                                    value="{{ end_date }}" 
+                                    class="text-sm bg-white border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200 flatpickr-date"
+                                    placeholder="Tanggal Akhir"
+                                >
+                                <span class="absolute right-3 top-1/2  -translate-y-1/2 text-gray-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </span>
+                            </div>
+
+                            <button type="submit" class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500/50 transition-all duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                 </svg>
-                            </span>
-                        </div>
+                                Filter
+                            </button>
+                        </form>
+                    </div>
+                </div>
 
-                        <span class="text-gray-400">-</span>
-
-                        <div class="relative">
-                            <input 
-                                type="text" 
-                                name="end"
-                                value="{{ end_date }}" 
-                                class="text-sm bg-white border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200 flatpickr-date"
-                                placeholder="Tanggal Akhir"
-                            >
-                            <span class="absolute right-3 top-1/2  -translate-y-1/2 text-gray-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <!-- Statistik Utama dengan Card Modern -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Total Pendapatan -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Total Pendapatan</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-2">Rp {{ total_pendapatan|intcomma }}</h3>
+                                <p class="text-sm text-gray-500 mt-1">Rata-rata: Rp {{ rata_rata_pendapatan|intcomma }}/bulan</p>
+                            </div>
+                            <div class="p-3 bg-green-100 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                            </span>
+                            </div>
                         </div>
+                    </div>
 
-                        <button type="submit" class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500/50 transition-all duration-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                            </svg>
-                            Filter
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Statistik Utama dengan Card Modern -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Total Pendapatan -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Total Pendapatan</p>
-                            <h3 class="text-2xl font-bold text-gray-800 mt-2">Rp {{ total_pendapatan|intcomma }}</h3>
-                            <p class="text-sm text-gray-500 mt-1">Rata-rata: Rp {{ rata_rata_pendapatan|intcomma }}/bulan</p>
+                    <!-- Total Pelanggan -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Total Pelanggan</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-2">{{ total_pelanggan }}</h3>
+                                <p class="text-sm text-gray-500 mt-1">Rata-rata: {{ rata_rata_pelanggan }}/bulan</p>
+                            </div>
+                            <div class="p-3 bg-blue-100 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                </svg>
+                            </div>
                         </div>
-                        <div class="p-3 bg-green-100 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+                    </div>
+
+                    <!-- Total Transaksi -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Total Transaksi</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-2">{{ total_transaksi }}</h3>
+                                <p class="text-sm text-gray-500 mt-1">Rata-rata: {{ rata_rata_transaksi }}/bulan</p>
+                            </div>
+                            <div class="p-3 bg-purple-100 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Member -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Total Member</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-2">{{ total_member }}</h3>
+                                <p class="text-sm text-gray-500 mt-1">Rata-rata: {{ rata_rata_member }}/bulan</p>
+                            </div>
+                            <div class="p-3 bg-yellow-100 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Paket -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Total Paket</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-2">{{ total_paket }}</h3>
+                            </div>
+                            <div class="p-3 bg-red-100 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Outlet -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Total Outlet</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-2">{{ total_outlet }}</h3>
+                            </div>
+                            <div class="p-3 bg-indigo-100 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Total Pelanggan -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Total Pelanggan</p>
-                            <h3 class="text-2xl font-bold text-gray-800 mt-2">{{ total_pelanggan }}</h3>
-                            <p class="text-sm text-gray-500 mt-1">Rata-rata: {{ rata_rata_pelanggan }}/bulan</p>
-                        </div>
-                        <div class="p-3 bg-blue-100 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                            </svg>
+                <!-- Grafik Transaksi -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800">Grafik Transaksi</h3>
+                        <div class="flex gap-4">
+                            <button class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800" onclick="updateChartView('transaksi')">Jumlah Transaksi</button>
+                            <button class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800" onclick="updateChartView('pendapatan')">Pendapatan</button>
                         </div>
                     </div>
+                    <div id="apex-single-area-chart" class="w-full"></div>
                 </div>
-
-                <!-- Total Transaksi -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Total Transaksi</p>
-                            <h3 class="text-2xl font-bold text-gray-800 mt-2">{{ total_transaksi }}</h3>
-                            <p class="text-sm text-gray-500 mt-1">Rata-rata: {{ rata_rata_transaksi }}/bulan</p>
-                        </div>
-                        <div class="p-3 bg-purple-100 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Total Member -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Total Member</p>
-                            <h3 class="text-2xl font-bold text-gray-800 mt-2">{{ total_member }}</h3>
-                            <p class="text-sm text-gray-500 mt-1">Rata-rata: {{ rata_rata_member }}/bulan</p>
-                        </div>
-                        <div class="p-3 bg-yellow-100 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Total Paket -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Total Paket</p>
-                            <h3 class="text-2xl font-bold text-gray-800 mt-2">{{ total_paket }}</h3>
-                        </div>
-                        <div class="p-3 bg-red-100 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Total Outlet -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Total Outlet</p>
-                            <h3 class="text-2xl font-bold text-gray-800 mt-2">{{ total_outlet }}</h3>
-                        </div>
-                        <div class="p-3 bg-indigo-100 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Grafik Transaksi -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-lg font-semibold text-gray-800">Grafik Transaksi</h3>
-                    <div class="flex gap-4">
-                        <button class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800" onclick="updateChartView('transaksi')">Jumlah Transaksi</button>
-                        <button class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800" onclick="updateChartView('pendapatan')">Pendapatan</button>
-                    </div>
-                </div>
-                <div id="apex-single-area-chart" class="w-full"></div>
             </div>
         </div>
     </main>

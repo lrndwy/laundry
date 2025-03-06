@@ -470,7 +470,7 @@ def format_transaksi_data(transaksi):
         'id': transaksi.id,
         'pelanggan': transaksi.pelanggan.nama,  # mengambil nama pelanggan
         'user': transaksi.user.username,  # mengambil username
-        'member': transaksi.member.nama if transaksi.member else None,
+        'member': transaksi.member.nama_member if transaksi.member else None,
         'outlet': transaksi.outlet.nama,  # mengambil nama outlet
         'total_harga': transaksi.total_harga,
         'kode_invoice': transaksi.kode_invoice,
